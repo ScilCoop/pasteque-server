@@ -310,15 +310,10 @@ function tpl_menu() {
 }
 
 function __tpl_report_title($report) {
-    echo '
-	<!-- start bloc titre -->
-    <div class="blc_ti">
-	<h1>' . $report->getTitle() . '</h1>
-	';
+    echo "<div class=\"blc_ti\">\n<h1>" . $report->getTitle() . "</h1>\n";
 }
 
 function __tpl_report_input($report, $values) {
-
     // Export button
     echo '
 	<ul class="bt_fonction">
@@ -330,22 +325,26 @@ function __tpl_report_input($report, $values) {
 		}
     	echo '">' . \i18n("Export") . '</a>
 	</li></ul>
-	</div>
-    <!-- end bloc titre -->';
-
-    // Input form
-    if(sizeof($report->getParams()) > 0) {
+	</div>';
+    if(is_array($report->getParams()) && sizeof($report->getParams()) > 0) {
+        // Input form
         echo "<div class=\"blc_content\"><form class=\"edit\" action=\"" . \Pasteque\get_current_url() . "\" "
                 . "method=\"post\">";
         foreach($report->getParams() as $param) {
             $id = $param['param'];
             echo "<div class=\"row\">";
-            echo "<label for=\"" . $id . "\">" . $param['label'] . "</label>";
+            if($param['label'] != null && $param['label'] != "" && $param['type'] != "hidden")
+                echo "<label for=\"" . $id . "\">" . $param['label'] . "</label>";
             switch ($param['type']) {
             case DB::DATE:
                 $value = \i18nDate($values[$id]);
                 echo "<input type=\"text\" name=\"" . $id . "\" id=\"" . $id
                         . "\" class=\"dateinput\" value=\"" . $value . "\" />";
+                break;
+            case 'hidden':
+                $value = $values[$param['param']];
+                echo "<input type=\"hidden\" name=\"" . $id . "\" id=\"" . $id
+                        . "\" value=\"" . $value . "\" />";
                 break;
             default:
                 $value = $values[$param['param']];
@@ -361,8 +360,31 @@ function __tpl_report_input($report, $values) {
     }
 }
 
+function __tpl_chart($headers,$datasets) {
+    echo "<script>\n";
+    echo "\tvar data = {\n";
+    echo "\t\tlabels: [";
+    foreach ($headers as $header) {
+        echo "\"".$header."\",";
+    }
+    echo "],\n";
+    echo "\t\tdatasets: [\n";
+    foreach ($datasets as $dataset) {
+        echo "\t\t\t{\n";
+        echo "\t\t\tlabel: \"".$dataset->title."\"\n";
+        echo "\t\t\tdata:";
+        for($i=0;$i<sizeof($dataset->data)-1;$i++) {
+            echo $dataset->data[$i].",";
+        }
+        echo $dataset->data[sizeof($dataset->data)]."]\n";
+        echo "\t\t\t},";
+    }
+    echo "};\n";
+    echo "</script>";
+}
+
 function __tpl_report_header($report) {
-    echo "<table class=\"report\" cellspacing=\"0\" cellpadding=\"0\">\n";
+    echo "<table id=\"".$report->getId()."\" class=\"report\" cellspacing=\"0\" cellpadding=\"0\">\n";
     echo "\t<thead>\n";
     echo "\t\t<tr>\n";
     foreach ($report->getHeaders() as $header) {
@@ -375,11 +397,13 @@ function __tpl_report_header($report) {
 function __tpl_report_footer($report) {
     echo "\t</tbody>\n";
     echo "</table>\n";
+    echo "<script>\$(function(){\$(\"#";
+    echo $report->getId();
+    echo "\").tablesorter();});</script>";
 }
 function __tpl_report_line($report, $line, $par) {
     echo "\t\t<tr class=\"row-" . ($par ? 'par' : 'odd') . "\">\n";
     foreach ($report->getFields() as $field) {
-        $field = strtoupper($field);
         if (isset($line[$field])) {
             echo "\t\t\t<td>" . $report->applyVisualFilter($field, $line)
                     . "</td>\n";
@@ -394,15 +418,15 @@ function __tpl_group_header($report, $run) {
 }
 function __tpl_group_footer($report, $run) {
     echo "\t\t<tr>\n";
-    echo "\t\t\t<th class=\"footer\" colspan=\"" . count($report->getHeaders()) . "\">" . \i18n("Subtotal") . "</th>\n";
+    echo "\t\t\t<td colspan=\"" . count($report->getHeaders()) . "\">" . \i18n("Subtotal") . "</td>\n";
     echo "\t\t</tr>\n";
     echo "\t\t<tr class=\"row-par\">\n";
     $subtotals = $run->getSubtotals();
     foreach ($report->getFields() as $field) {
         if (isset($subtotals[$field])) {
-            echo "\t\t\t<td class=\"footer\">" . $report->applyVisualFilter($field, $subtotals[$field]) . "</td>\n";
+            echo "\t\t\t<td>" . $report->applyVisualFilter($field, $subtotals[$field]) . "</td>\n";
         } else {
-            echo "\t\t\t<td class=\"footer\"></td>\n";
+            echo "\t\t\t<td></td>\n";
         }
     }
     echo "\t\t</tr>\n";
@@ -447,6 +471,7 @@ function __tpl_report_totals($report, $run) {
     echo "\t\t</tr>\n";
     __tpl_report_footer($report);
 }
+
 /** Display a report.
  * @param $report Report data, as given by get_report
  */
@@ -568,6 +593,7 @@ function tpl_chart($chart) {
     }
     __tpl_chart($chart->getHeaders(),$chart->getDatasets());
 }
+
 
 function __tpl_pagination_url($offset,$start=0) {
     $url = \Pasteque\get_current_url();
