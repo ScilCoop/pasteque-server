@@ -181,7 +181,7 @@ class ProductsService {
         $stmt = $pdo->prepare("SELECT * FROM PRODUCTS, PRODUCTS_CAT WHERE "
                 . "PRODUCTS.ID = PRODUCTS_CAT.PRODUCT AND DELETED = "
                 . $db->false() . " AND PRODUCTS.CATEGORY = :cat "
-                . "ORDER BY CATORDER");
+                . "ORDER BY CATORDER, NAME");
         $stmt->bindParam(":cat", $categoryId, \PDO::PARAM_STR);
         if ($stmt->execute()) {
             $prds = array();
@@ -232,7 +232,8 @@ class ProductsService {
         }
         $sql = "UPDATE PRODUCTS SET REFERENCE = :ref, CODE = :code, "
                 . "NAME = :name, PRICEBUY = :buy, PRICESELL = :sell, "
-                . "CATEGORY = :cat, PROVIDER = :prov, TAXCAT = :tax, ATTRIBUTESET_ID = :attr, "
+                . "CATEGORY = :cat, PROVIDER = :prov, TAXCAT = :tax, "
+                . "ATTRIBUTESET_ID = :attr, "
                 . "ISSCALE = :scale, DISCOUNTENABLED = :discountEnabled, "
                 . "DISCOUNTRATE = :discountRate";
         if ($image !== "") {
@@ -250,7 +251,12 @@ class ProductsService {
         }
         $stmt->bindParam(":sell", $prd->priceSell, \PDO::PARAM_STR);
         $stmt->bindParam(":cat", $prd->categoryId, \PDO::PARAM_INT);
-        $stmt->bindParam(":prov", $prd->providerId, \PDO::PARAM_STR);
+        if ($prd->providerId === null || $prd->providerId === "") {
+            $stmt->bindParam(":prov", $prd->providerId, \PDO::PARAM_NULL);
+        }
+        else {
+            $stmt->bindParam(":prov", $prd->providerId, \PDO::PARAM_STR);
+        }
         $stmt->bindParam(":tax", $prd->taxCatId, \PDO::PARAM_INT);
         $stmt->bindParam(":attr", $prd->attributeSetId, \PDO::PARAM_INT);
         $stmt->bindParam(":scale", $db->boolVal($prd->scaled));

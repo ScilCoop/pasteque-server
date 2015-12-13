@@ -1,8 +1,8 @@
 <?php
-//    Pastèque Web back office, Products module
+//    Pastèque API
 //
 //    Copyright (C) 2015 Scil (http://scil.coop)
-//    Philippe Pary
+//    Philippe Pary (philippe@scil.coop)
 //
 //    This file is part of Pastèque.
 //
@@ -18,17 +18,31 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with Pastèque.  If not, see <http://www.gnu.org/licenses/>.
-namespace ProductProviders;
 
-function init() {
-    global $MENU;
-    $MENU->addSection("catalog", "Catalog", PLUGIN_NAME);
-    $MENU->registerModuleEntry("catalog", PLUGIN_NAME, "menu_category.png", "Providers", "providers");
-    $MENU->addSection("sales", "Sales", PLUGIN_NAME);
-    $MENU->registerModuleReport("sales", PLUGIN_NAME, "menu_product_sales.png", "Sales by provider", "sales_by_provider_report");
-    \Pasteque\register_i18n(PLUGIN_NAME);
+namespace Pasteque;
+
+/** This is a "do nothing" API for automatic testing */
+class DiscountsAPI extends APIService {
+
+    protected function check() {
+        switch ($this->action) {
+        case 'get':
+            return isset($this->params['id']);
+        case 'getAll':
+            return true;
+        }
+        return false;
+    }
+    protected function proceed() {
+        switch ($this->action) {
+        case 'get':
+            $this->succeed(DiscountsService::get($this->params['id']));
+            break;
+        case 'getAll':
+            $this->succeed(DiscountsService::getAll());
+            break;
+        }
+    }
 }
-
-\Pasteque\hook("module_load", __NAMESPACE__ . "\init");
 
 ?>

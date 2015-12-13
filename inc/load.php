@@ -17,7 +17,6 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with Pastèque.  If not, see <http://www.gnu.org/licenses/>.
-
 namespace Pasteque;
 
 /** Check a core module readability. Returns the module file to import if
@@ -102,6 +101,7 @@ require_once(PT::$ABSPATH . "/inc/data/models/Ticket.php");
 require_once(PT::$ABSPATH . "/inc/data/models/TicketLine.php");
 require_once(PT::$ABSPATH . "/inc/data/models/CashMovement.php");
 require_once(PT::$ABSPATH . "/inc/data/models/DiscountProfile.php");
+require_once(PT::$ABSPATH . "/inc/data/models/Discount.php");
 require_once(PT::$ABSPATH . "/inc/data/models/Customer.php");
 require_once(PT::$ABSPATH . "/inc/data/models/CustTaxCat.php");
 require_once(PT::$ABSPATH . "/inc/data/models/User.php");
@@ -125,6 +125,7 @@ require_once(PT::$ABSPATH . "/inc/data/services/TaxesService.php");
 require_once(PT::$ABSPATH . "/inc/data/services/TicketsService.php");
 require_once(PT::$ABSPATH . "/inc/data/services/CashMovementsService.php");
 require_once(PT::$ABSPATH . "/inc/data/services/DiscountProfilesService.php");
+require_once(PT::$ABSPATH . "/inc/data/services/DiscountsService.php");
 require_once(PT::$ABSPATH . "/inc/data/services/CustomersService.php");
 require_once(PT::$ABSPATH . "/inc/data/services/CustTaxCatsService.php");
 require_once(PT::$ABSPATH . "/inc/data/services/UsersService.php");

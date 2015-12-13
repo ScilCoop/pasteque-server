@@ -1,22 +1,23 @@
 <?php
-//    POS-Tech API
+//    Pastèque API
 //
-//    Copyright (C) 2012 Scil (http://scil.coop)
+//    Copyright (C) 2015 Scil (http://scil.coop)
+//    Cédric Houbart, Philippe Pary
 //
-//    This file is part of POS-Tech.
+//    This file is part of Pastèque.
 //
-//    POS-Tech is free software: you can redistribute it and/or modify
+//    Pastèque is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
 //    the Free Software Foundation, either version 3 of the License, or
 //    (at your option) any later version.
 //
-//    POS-Tech is distributed in the hope that it will be useful,
+//    Pastèque is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //    GNU General Public License for more details.
 //
 //    You should have received a copy of the GNU General Public License
-//    along with POS-Tech.  If not, see <http://www.gnu.org/licenses/>.
+//    along with Pastèque.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Pasteque;
 
@@ -45,7 +46,8 @@ class TicketsAPI extends APIService {
                     || $this->isParamSet("dateStart")
                     || $this->isParamSet("dateStop")
                     || $this->isParamSet("customerId")
-                    || $this->isParamSet("userId"));
+                    || $this->isParamSet("userId")
+                    || $this->isParamSet("limit"));
         case 'delete':
             return $this->isParamSet("id");
         }
@@ -74,9 +76,9 @@ class TicketsAPI extends APIService {
             foreach ($json->lines as $jsLine) {
                 // Get line info
                 $tktLine = new SharedTicketLines($ticket->id,
-						$jsLine->dispOrder, $jsLine->productId, $jsLine->taxId,
-						$jsLine->quantity, $jsLine->discountRate,
-						$jsLine->price, $jsLine->attributes);
+                        $jsLine->dispOrder, $jsLine->productId, $jsLine->taxId,
+                        $jsLine->quantity, $jsLine->discountRate,
+                        $jsLine->price, $jsLine->attributes);
                 $lines[] = $tktLine;
             }
             if (TicketsService::createSharedTicket($ticket, $lines) === false) {
@@ -93,7 +95,8 @@ class TicketsAPI extends APIService {
             $this->succeed(TicketsService::search($this->getParam("ticketId"),
                     $this->getParam("ticketType"), $this->getParam("cashId"),
                     $this->getParam("dateStart"), $this->getParam("dateStop"),
-                    $this->getParam("customerId"), $this->getParam("userId")));
+                    $this->getParam("customerId"), $this->getParam("userId"),
+                    $this->getParam("limit")));
             break;
         case 'delete':
             if (!TicketsService::delete($this->getParam("id"))) {
@@ -142,6 +145,7 @@ class TicketsAPI extends APIService {
                     $this->fail(new APIError("Unable to decode ticket"));
                     break;
                 }
+                $ticketId = $jsonTkt->ticketId;
                 $userId = $jsonTkt->userId;
                 $customerId = $jsonTkt->customerId;
                 $date = $jsonTkt->date;
@@ -189,6 +193,9 @@ class TicketsAPI extends APIService {
                         $attrsId = null;
                     }
                     $product = ProductsService::get($productId);
+                    if ($product === null) {
+                        $product = new Product($productId,$productId,$productId,null,null,null,$taxId,true,false);
+                    }
                     $tax = TaxesService::getTax($taxId);
                     if ($tax == null) {
                         $this->fail(new APIError("Unknown tax"));
@@ -230,32 +237,32 @@ class TicketsAPI extends APIService {
                 $ticket = new Ticket($tktType, $userId, $date, $lines,
                         $payments, $cashId, $customerId, $custCount,
                         $tariffAreaId, $discountRate, $discountProfileId);
+                $ticket->ticketId = $ticketId;
                 if (isset($jsonTkt->id)) {
                     // Ticket edit
-                    $id = $jsonTkt->id;
+                    $ticket->id = $jsonTkt->id;
                     //Check if cash is still opened
                     $oldTicket = TicketsService::get($id);
-                    $cashSrv = new CashesService();
-                    $cash = $cashSrv->get($oldTicket->cashId);
-                    if ($cash->isClosed()) {
-                        $this->fail(new APIError("Cannot edit a ticket from "
-                                        . "a closed cash"));
-                        break;
-                    }
-                    // Merge some data from old ticket
-                    $ticket->id = $id;
-                    $ticket->ticketId = $oldTicket->ticketId;
-                    // Delete the old ticket and recreate
-                    if (TicketsService::delete($oldTicket->id)
-                            && TicketsService::save($ticket, $locationId)) {
-                        $successes++;
-                    } else {
-                        $this->fail(new APIError("Unable to edit ticket"));
-                        break;
+                    if($oldTicket != null) {
+                        $cashSrv = new CashesService();
+                        $cash = $cashSrv->get($oldTicket->cashId);
+                        if ($cash->isClosed()) {
+                            $this->fail(new APIError("Cannot edit a ticket from "
+                                            . "a closed cash"));
+                            break;
+                        }
+                        // Delete the old ticket and recreate
+                        if (TicketsService::delete($oldTicket->id)
+                                && TicketsService::save($ticket, $locationId)) {
+                            $successes++;
+                        } else {
+                            $this->fail(new APIError("Unable to edit ticket"));
+                            break;
+                        }
                     }
                 } else {
                     // New ticket
-                    if (TicketsService::save($ticket, $locationId)) {
+                    if (TicketsService::save($ticket)) {
                         $successes++;
                     } else {
                         $this->fail(new APIError("Unable to save ticket"));
@@ -267,6 +274,8 @@ class TicketsAPI extends APIService {
             $ret = ($successes == $ticketsCount);
             if ($ret === true) {
                 if ($pdo->commit()) {
+                    $ticketId++;
+                    $cashRegSrv->setNextTicketId($ticketId,$cash->cashRegisterId);
                     $this->succeed(array("saved" => $ticketsCount));
                 } else {
                     $this->fail(APIError::$ERR_GENERIC);

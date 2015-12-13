@@ -111,15 +111,15 @@ $anchor = str_replace(' ','',$anchor);
 
 <h2 id="<?php echo $anchor; ?>"><?php echo \Pasteque\esc_html($category->label); ?></h2>
 <table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th></th>
-			<th><?php \pi18n("Product.reference"); ?></th>
-			<th><?php \pi18n("Product.label"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
+    <thead>
+        <tr>
+            <th></th>
+            <th><?php \pi18n("Product.reference"); ?></th>
+            <th><?php \pi18n("Product.label"); ?></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
 <?php
         foreach ($prdCat[$category->id] as $product) {
             if ($product->visible) {
@@ -130,11 +130,11 @@ $anchor = str_replace(' ','',$anchor);
                     $imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product";
                 }
 ?>
-	<tr class="row-<?php echo $par ? 'par' : 'odd'; ?>">
-	    <td><img class="thumbnail" src="?<?php echo $imgSrc ?>" />
-		<td><?php echo $product->reference; ?></td>
-		<td><?php echo $product->label; ?></td>
-		<td class="edition">
+    <tr class="row-<?php echo $par ? 'par' : 'odd'; ?>">
+        <td><img class="thumbnail" src="?<?php echo $imgSrc ?>" />
+        <td><?php echo $product->reference; ?></td>
+        <td><?php echo $product->label; ?></td>
+        <td class="edition">
                     <?php \Pasteque\tpl_btn('btn-edition', \Pasteque\get_module_url_action(
                             PLUGIN_NAME, 'product_edit', array("id" => $product->id)), "",
                             'img/edit.png', \i18n('Edit'), \i18n('Edit'));
@@ -142,8 +142,8 @@ $anchor = str_replace(' ','',$anchor);
                     <?php \Pasteque\tpl_btn('btn-delete', \Pasteque\get_current_url() . "&delete-product=" . $product->id, "",
                             'img/delete.png', \i18n('Delete'), \i18n('Delete'), true);
                     ?>
-		</td>
-	</tr>
+        </td>
+    </tr>
 <?php
             } else {
                 $archive = true;
@@ -151,7 +151,7 @@ $anchor = str_replace(' ','',$anchor);
             }
         }
 ?>
-	</tbody>
+    </tbody>
 </table>
 <?php
     }
@@ -167,34 +167,34 @@ foreach ($categories as $category) {
 ?>
 <h2 id="<?php echo $anchor; ?>"><?php echo \Pasteque\esc_html($category->label); ?></h2>
 <table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th></th>
-			<th><?php \pi18n("Product.reference"); ?></th>
-			<th><?php \pi18n("Product.label"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
+    <thead>
+        <tr>
+            <th></th>
+            <th><?php \pi18n("Product.reference"); ?></th>
+            <th><?php \pi18n("Product.label"); ?></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
 <?php
         $par = false;
         foreach ($archivesCat[$category->id] as $product) {
             if (!$product->visible) {
                 $par = !$par;
 ?>
-	<tr class="row-<?php echo $par ? 'par' : 'odd'; ?>">
-	    <td><img class="thumbnail" src="?<?php echo \Pasteque\PT::URL_ACTION_PARAM; ?>=img&w=product&id=<?php echo $product->id; ?>" />
-		<td><?php echo $product->reference; ?></td>
-		<td><?php echo $product->label; ?></td>
-		<td class="edition">
-			<a href="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'product_edit', array('id' => $product->id)); ?>"><img src="<?php echo \Pasteque\get_template_url(); ?>img/edit.png" alt="<?php \pi18n('Edit'); ?>" title="<?php \pi18n('Edit'); ?>"></a>
-		</td>
-	</tr>
+    <tr class="row-<?php echo $par ? 'par' : 'odd'; ?>">
+        <td><img class="thumbnail" src="?<?php echo \Pasteque\PT::URL_ACTION_PARAM; ?>=img&w=product&id=<?php echo $product->id; ?>" />
+        <td><?php echo $product->reference; ?></td>
+        <td><?php echo $product->label; ?></td>
+        <td class="edition">
+            <a href="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'product_edit', array('id' => $product->id)); ?>"><img src="<?php echo \Pasteque\get_template_url(); ?>img/edit.png" alt="<?php \pi18n('Edit'); ?>" title="<?php \pi18n('Edit'); ?>"></a>
+        </td>
+    </tr>
 <?php
             }
         }
 ?>
-	</tbody>
+    </tbody>
 </table>
 <?php
     }
