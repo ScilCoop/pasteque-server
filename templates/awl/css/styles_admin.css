@@ -1249,3 +1249,7 @@ div.pagination:after {
     display: block;
     clear: both;
 }
+
+#barcodeImg {
+    display:block;
+}
