@@ -24,7 +24,7 @@ $message = NULL;
 $error = NULL;
 
 $categories = \Pasteque\CategoriesService::getAll();
-$allProducts = \Pasteque\ProductsService::getAll(TRUE);
+$allProducts = \Pasteque\ProductsService::getAll();
 $products = array();
 foreach ($allProducts as $product) {
     if ($product->barcode !== NULL && $product->barcode != "") {
@@ -60,23 +60,23 @@ foreach ($allProducts as $product) {
 
     <div id="catalog-picker"></div>
 
-	<table cellpadding="0" cellspacing="0">
-		<thead>
-			<tr>
-				<th></th>
-				<th><?php \pi18n("Product.reference"); ?></th>
-				<th><?php \pi18n("Product.label"); ?></th>
-				<th><?php \pi18n("Quantity"); ?></th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody id="list">
-		</tbody>
-	</table>
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+            <tr>
+                <th></th>
+                <th><?php \pi18n("Product.reference"); ?></th>
+                <th><?php \pi18n("Product.label"); ?></th>
+                <th><?php \pi18n("Quantity"); ?></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="list">
+        </tbody>
+    </table>
 
-	<div class="row actions">
-		<?php \Pasteque\form_send(); ?>
-	</div>
+        <div class="row actions">
+            <?php \Pasteque\form_send(); ?>
+        </div>
 
 </form>
 
@@ -84,29 +84,32 @@ foreach ($allProducts as $product) {
         $categories, $products); ?>
 
 <script type="text/javascript">
-
-	addProduct = function(productId) {
-		var product = catalog.products[productId];
-		if (jQuery("#line-" + productId).length > 0) {
-			// Add quantity to existing line
-			var qty = jQuery("#line-" + productId + "-qty");
-			var currVal = qty.val();
-			qty.val(parseInt(currVal) + 1);
-		} else {
-			// Add line
-			var html = "<tr id=\"line-" + product['id'] + "\">\n";
-			html += "<td><img class=\"thumbnail\" src=\"" + product['img'] + "\" /></td>\n";
-			html += "<td>" + product['reference'] + "</td>\n";
-			html += "<td>" + product['label'] + "</td>\n";
-			html += "<td class=\"qty-cell\"><input class=\"qty\" id=\"line-" + product['id'] + "-qty\" type=\"numeric\" name=\"qty-" + product['id'] + "\" value=\"1\" />\n";
-			html += "<td><a class=\"btn-delete\" href=\"\" onClick=\"javascript:deleteLine('" + product['id'] + "');return false;\"><?php \pi18n("Delete"); ?></a></td>\n";
-			html += "</tr>\n"; 
-			jQuery("#list").append(html);
-		}
-	}
-
-	deleteLine = function(productId) {
-		jQuery("#line-" + productId).detach();
-	}
-
+        addProduct = function(productId) {
+            var product = catalog.products[productId];
+            if (jQuery("#line-" + productId).length > 0) {
+                // Add quantity to existing line
+                var qty = jQuery("#line-" + productId + "-qty");
+                var currVal = qty.val();
+                qty.val(parseInt(currVal) + 1);
+            } else {
+                // Add line
+                var src;
+                if (product['hasImage']) {
+                    src = "?p=img&w=product&id=" + product['id'];
+                } else {
+                    src = "?p=img&w=product";
+                }
+                var html = "<tr id=\"line-" + product['id'] + "\">\n";
+                html += "<td><img class=\"thumbnail\" src=\"" + src + "\" /></td>\n";
+                html += "<td>" + product['reference'] + "</td>\n";
+                html += "<td>" + product['label'] + "</td>\n";
+                html += "<td class=\"qty-cell\"><input class=\"qty\" id=\"line-" + product['id'] + "-qty\" type=\"numeric\" name=\"qty-" + product['id'] + "\" value=\"1\" />\n";
+                html += "<td><a class=\"btn-delete\" href=\"\" onClick=\"javascript:deleteLine('" + product['id'] + "');return false;\"><?php \pi18n("Delete"); ?></a></td>\n";
+                html += "</tr>\n"; 
+                jQuery("#list").append(html);
+            }
+        }
+    deleteLine = function(productId) {
+    jQuery("#line-" + productId).detach();
+}
 </script>
