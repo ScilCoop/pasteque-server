@@ -22,23 +22,24 @@ namespace Pasteque;
 
 function tpl_open() {
 ?><!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+<html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title><?php \pi18n("Pastèque"); ?></title>
-    <link rel="icon" type="image/png" href="templates/pt2.0/img/icon.png" />
-    <link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/style.css" />
-    <link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/catalog.css" />
-    <link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/stock.css" />
-    <link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/js/pepper-grinder/jquery-ui-1.10.4.custom.css" />
-    <script type="text/javascript" src="<?php echo get_template_url(); ?>/js/jquery-1.9.1.min.js"></script>
-    <script type="text/javascript" src="<?php echo get_template_url(); ?>/js/jquery-ui-1.10.4.custom.min.js"></script>
-    <script type="text/javascript" src="<?php echo get_template_url(); ?>/js/jquery-tablesorter.min.js"></script>
-    <script type="text/javascript" src="?<?php echo \Pasteque\PT::URL_ACTION_PARAM; ?>=img&w=js&id=js/pasteque.js.php"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset=utf-8">
+	<title><?php \pi18n("Pastèque"); ?></title>
+	<link rel="icon" type="image/png" href="templates/pt2.0/img/icon.png">
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/css/style.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/css/responsive.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/css/catalog.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/css/stock.css">
+	<script type="text/javascript" src="<?php echo get_template_url(); ?>/js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="<?php echo get_template_url(); ?>/js/jquery-ui-1.10.4.custom.min.js"></script>
+	<script type="text/javascript" src="<?php echo get_template_url(); ?>/js/jquery-tablesorter.min.js"></script>
+	<script type="text/javascript" src="?<?php echo \Pasteque\PT::URL_ACTION_PARAM; ?>=img&w=js&id=js/pasteque.js.php"></script>
 </head>
 <body>
 <div id="header">
-    <div id="version"><a href="" onclick="showAbout();return false;"><?php echo \i18n("About"); ?></a></div>
+	<div id="version"><a href="" onclick="showAbout();return false;"><?php echo \i18n("About"); ?></a></div>
 </div>
 <?php tpl_menu(); ?>
 
@@ -89,8 +90,9 @@ function tpl_msg_box($info, $error) {
 
 function tpl_menu() {
     global $MENU;
-    echo "<div id=\"menu-container\">\n";
-    echo "<div id=\"logo\"><a href=\"" . get_url_action("home") . "\"><img src=\"" . get_template_url() . "img/logo.png\" /></a></div>\n";
+    echo "<a class=\"responsive-button\" href=\"#menu-container\">&equiv;</a>";
+    echo "<nav id=\"menu-container\" role=\"menu-container\">\n";
+    echo "<div id=\"logo\"><a href=\"#\"><img src=\"" . get_template_url() . "img/logo.png\" /></a></div>\n";
     foreach ($MENU->getSections() as $section) {
         echo "\t<div class=\"menu-section\">\n";
         echo "\t\t<div class=\"menu-section-title\">";
@@ -119,7 +121,7 @@ function tpl_menu() {
         echo "\t\t</ul>\n";
         echo "\t</div>\n";
     }
-    echo "</div>";
+    echo "</nav>";
 }
 
 function __tpl_report_title($report) {
