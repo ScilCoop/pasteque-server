@@ -24,24 +24,62 @@
 		width: 0;
 		height: 100%;
 		overflow: hidden;
-		position: fixed;
+		position: relative;
+		margin-right: 1em;
 		top: 0; left: 0;
 		padding: 0;
 		background-color: white;
-		border-right: solid 1px #21435C;
 
 		ul li {
 			width:100%;
 		}
 	}
 
+	#content {
+		margin: 0;
+		padding: 0 5dip 10dip 15dip;
+	}
+
 	#menu-container:target {
 		width: 200px;
 	}
 
-	#content {
+	#logo {
+		margin-bottom: 10px;
+	}
+
+	.menu-section {
+		width: 100%;
 		margin: 0;
-		padding: 0 5dip 10dip 15dip;
+	}
+
+	.menu-section-title {
+		padding: 10px 0;
+	}
+
+	.menu {
+		display: none;
+		padding: 0;
+	}
+
+	.menu ul {
+		width: 100%;
+		padding: 0;
+	}
+
+	.menu li {
+		border-top: solid 1px white;
+		margin: 0;
+		padding: 5px 0;
+		width: 100%;
+	}
+
+	.menu li:nth-child(even) {
+		background-color: #EEE;
+	}
+
+	.menu li:nth-child(odd) {
+		background-color: #DDD;
 	}
 
 	#content h1 {
