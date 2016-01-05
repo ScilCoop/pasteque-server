@@ -99,6 +99,8 @@ nav[role="menu-container"] {
 	list-style-type: none;
 	padding: 3px 8px;
 	margin: 0px;
+	transition: height 1s ease-in-out;
+	transition: visibility 0s, opacity 0.5s linear;
 }
 
 .menu li {

@@ -92,9 +92,9 @@ function tpl_menu() {
     global $MENU;
     echo "<a class=\"responsive-button\" href=\"#menu-container\">&equiv;</a>";
     echo "<nav id=\"menu-container\" role=\"menu-container\">\n";
-    echo "<div id=\"logo\"><a href=\"#\"><img src=\"" . get_template_url() . "img/logo.png\" /></a></div>\n";
+    echo "<div id=\"logo\"><a href=\"#\"><img src=\"" . get_template_url() . "img/logo.png\"></a></div>\n";
     foreach ($MENU->getSections() as $section) {
-        echo "\t<div class=\"menu-section\">\n";
+        echo "\t<div class=\"menu-section\" onclick=\"$(this).find('.menu').slideToggle()\">\n";
         echo "\t\t<div class=\"menu-section-title\">";
         \pi18n($section->getName(), $section->getNameDomain());
         echo "</div>\n";

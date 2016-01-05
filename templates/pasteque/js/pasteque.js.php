@@ -39,17 +39,3 @@ $jsDateFormat = str_replace(array("%Y", "%m", "%d"),
     $( ".dateinput" ).datepicker({ dateFormat: "<?php echo $jsDateFormat; ?>", buttonImage: "<?php echo get_template_url(); ?>/img/calendar.png", showOn: "both" });
     $( ".dateinput" ).datepicker({ dateFormat: "<?php echo $jsDateFormat; ?>", buttonImage: "<?php echo get_template_url(); ?>/img/calendar.png", showOn: "both" });
 });
-
-var menuHidden = false;
-var menuWidth = "";
-function toggleMenu() {
-    if (menuHidden) {
-        $("#menu-container").show();
-        $("#content").css("margin-left", menuWidth + "px");
-    } else {
-        menuWidth = $("#menu-container").outerWidth(true);
-        $("#menu-container").hide();
-        $("#content").css("margin-left", "0px");
-    }
-    menuHidden = !menuHidden;
-}
