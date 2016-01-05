@@ -36,6 +36,9 @@ function timefstr($format, $date) {
         // Erase default hour/minute/second if not in format
         $dateTime->setTime(0, 0, 0);
     }
+    if(!$dateTime) {
+	return null;
+    }
     return $dateTime->getTimestamp();
 }
 
