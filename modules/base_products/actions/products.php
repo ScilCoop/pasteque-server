@@ -25,65 +25,64 @@ namespace BaseProducts;
 $message = null;
 $error = null;
 if (isset($_GET['delete-product'])) {
-    if (\Pasteque\ProductsService::delete($_GET['delete-product'])) {
-        $message = \i18n("Changes saved") ;
-    } else {
-        $message = "Le produit a été placé en archive (car déjà vendu ou en stock)";
-    }
+	if (\Pasteque\ProductsService::delete($_GET['delete-product'])) {
+		$message = \i18n("Changes saved") ;
+	}
+	else {
+		$message = "Le produit a été placé en archive (car déjà vendu ou en stock)";
+	}
 }
 
 if(!isset($_GET["start"])) {
-    $start = 0;
+	$start = 0;
 }
 else {
-    $start = $_GET["start"];
+	$start = $_GET["start"];
 }
 if(!isset($_GET["range"])) {
-    $range = 50;
+	$range = 50;
 }
 else {
-    $range = $_GET["range"];
+	$range = $_GET["range"];
 }
 if(!isset($_GET["hidden"])) {
-    $hidden = true;
+	$hidden = true;
 }
 else {
-    $hidden = $_GET["hidden"];
+	$hidden = $_GET["hidden"];
 }
 
 if($range == "all") {
-    $products = \Pasteque\ProductsService::getAll($hidden);
-    $totalProducts = \Pasteque\ProductsService::getTotal($hidden);
+	$products = \Pasteque\ProductsService::getAll($hidden);
+	$totalProducts = \Pasteque\ProductsService::getTotal($hidden);
 }
 else if(isset($_GET["category"])) {
-    $products = \Pasteque\ProductsService::getByCategory($_GET["category"]);
-    $totalProducts = \Pasteque\ProductsService::getTotalByCategory($_GET["category"],$hidden);
+	$products = \Pasteque\ProductsService::getByCategory($_GET["category"]);
+	$totalProducts = \Pasteque\ProductsService::getTotalByCategory($_GET["category"],$hidden);
 }
 else {
-    $products = \Pasteque\ProductsService::getRange($range,$start,$hidden);
-    $totalProducts = \Pasteque\ProductsService::getTotal($hidden);
+	$products = \Pasteque\ProductsService::getRange($range,$start,$hidden);
+	$totalProducts = \Pasteque\ProductsService::getTotal($hidden);
 }
 $categories = \Pasteque\CategoriesService::getAll();
 $prdCat = array();
 $archivesCat = array();
 foreach ($products as $product) {
-    if ($product->categoryId !== \Pasteque\CompositionsService::CAT_ID) {
-        $prdCat[$product->categoryId][] = $product;
-    }
-    // Archive will be filled on display loop
+	if ($product->categoryId !== \Pasteque\CompositionsService::CAT_ID) {
+		$prdCat[$product->categoryId][] = $product;
+	}
+	// Archive will be filled on display loop
 }
-?>
-<h1><?php \pi18n("Products", PLUGIN_NAME); ?></h1>
 
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
-
-
-<?php \Pasteque\tpl_btn('btn-add', \Pasteque\get_module_url_action(PLUGIN_NAME, "product_edit"),
-        \i18n('Add a product', PLUGIN_NAME), 'img/btn_add.png');?>
-<?php \Pasteque\tpl_btn('btn-import', \Pasteque\get_module_url_action(PLUGIN_NAME, "productsManagement"),
-        \i18n('Import products', PLUGIN_NAME), 'img/btn_add.png');?>
-<?php \Pasteque\tpl_btn('btn-export ', \Pasteque\get_report_url(PLUGIN_NAME, "products_export"),
-        \i18n('Export products', PLUGIN_NAME), 'img/btn_add.png');?>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Products", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\addButton(\i18n("Add a product", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "product_edit"));
+$buttons .= \Pasteque\importButton(\i18n("Import products", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "productsManagement"));
+$buttons .= \Pasteque\exportButton(\i18n("Export products", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME,"products_export"));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Information
+\Pasteque\tpl_msg_box($message, $error); ?>
 
 <div id="search">
 <div class="title"><?php \pi18n("Search"); ?></div>
@@ -93,118 +92,81 @@ foreach ($products as $product) {
 ?>
 </div>
 
-<p><?php \pi18n("%d products", PLUGIN_NAME, $totalProducts); ?></p>
-
-<h2><?php \pi18n("Catalog", PLUGIN_NAME); ?></h2>
+<?php
+//Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d products", PLUGIN_NAME, $totalProducts)));
+?></p>
 
 <?php \Pasteque\tpl_pagination($totalProducts,$range,$start); ?>
 
 <?php
 $archive = false;
 foreach ($categories as $category) {
-    if (isset($prdCat[$category->id])) { ?>
-<h3><?php echo \Pasteque\esc_html($category->label); ?></h3>
-<table cellpadding="0" cellspacing="0">
-    <thead>
-        <tr>
-            <th></th>
-            <th><?php \pi18n("Product.reference"); ?></th>
-            <th><?php \pi18n("Product.label"); ?></th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-<?php
-        foreach ($prdCat[$category->id] as $product) {
-            if ($product->visible) {
-                if ($product->hasImage) {
-                    $imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product&id=" . $product->id;
-                } else {
-                    $imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product";
-                }
-?>
-    <tr>
-        <td><img class="thumbnail" src="?<?php echo $imgSrc ?>" />
-        <td><?php echo $product->reference; ?></td>
-        <td><?php echo $product->label; ?></td>
-        <td class="edition">
-                    <?php \Pasteque\tpl_btn('btn-edition', \Pasteque\get_module_url_action(
-                            PLUGIN_NAME, 'product_edit', array("id" => $product->id)), "",
-                            'img/edit.png', \i18n('Edit'), \i18n('Edit'));
-                    ?>
-                    <?php \Pasteque\tpl_btn('btn-delete', \Pasteque\get_current_url() . "&delete-product=" . $product->id, "",
-                            'img/delete.png', \i18n('Delete'), \i18n('Delete'), true);
-                    ?>
-        </td>
-    </tr>
-<?php
-            } else {
-                $archive = true;
-                $archivesCat[$category->id][] = $product;
-            }
-        }
-?>
-    </tbody>
-</table>
-<?php
-    }
+	if (isset($prdCat[$category->id])) {
+		$content[0][0] = "";
+		$content[0][1] = \i18n("Product.reference");
+		$content[0][2] = \i18n("Product.label");
+		$i = 1;
+		foreach ($prdCat[$category->id] as $product) {
+			if ($product->visible) {
+				if ($product->hasImage) {
+					$imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product&id=" . $product->id;
+				} else {
+					$imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product";
+				}
+				$content[$i][0] = "<img class=\"img img-thumbnail thumbnail\" src=\"?" . $imgSrc . "\">";
+				$content[$i][1] = $product->reference;
+				$content[$i][2] = $product->label;
+				$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'product_edit', array("id" => $product->id)));
+				$btn_group .= \Pasteque\deleteButton(\i18n('Delete', PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-product=" . $product->id);
+				$content[$i][2] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+				$i++;
+			}
+			else {
+				$archive = true;
+				$archivesCat[$category->id][] = $product;
+			}
+		}
+		if(sizeof($content) > 1) {
+			echo \Pasteque\row(\Pasteque\secondaryTitle(\Pasteque\esc_html($category->label)));
+			echo \Pasteque\row(\Pasteque\standardTable($content));
+		}
+		unset($content);
+	}
 }
-?>
-<?php if ($archive) { ?>
-<h2><?php \pi18n("Archived", PLUGIN_NAME); ?></h2>
-<?php
-foreach ($categories as $category) {
-    if (isset($archivesCat[$category->id])) {
-?>
-<h3><?php echo \Pasteque\esc_html($category->label); ?></h3>
-<table cellpadding="0" cellspacing="0">
-    <thead>
-        <tr>
-            <th></th>
-            <th><?php \pi18n("Product.reference"); ?></th>
-            <th><?php \pi18n("Product.label"); ?></th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-<?php
-        foreach ($archivesCat[$category->id] as $product) {
-            if (!$product->visible) {
-?>
-<<<<<<< HEAD
-    <tr class="row-<?php echo $par ? 'par' : 'odd'; ?>">
-        <td><img class="thumbnail" src="?<?php echo \Pasteque\PT::URL_ACTION_PARAM; ?>=img&w=product&id=<?php echo $product->id; ?>" />
-        <td><?php echo $product->reference; ?></td>
-        <td><?php echo $product->label; ?></td>
-        <td class="edition">
-            <a href="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'product_edit', array('id' => $product->id)); ?>"><img src="<?php echo \Pasteque\get_template_url(); ?>img/edit.png" alt="<?php \pi18n('Edit'); ?>" title="<?php \pi18n('Edit'); ?>"></a>
-        </td>
-    </tr>
-=======
-	<tr>
-	    <td><img class="thumbnail" src="?<?php echo \Pasteque\PT::URL_ACTION_PARAM; ?>=img&w=product&id=<?php echo $product->id; ?>" />
-		<td><?php echo $product->reference; ?></td>
-		<td><?php echo $product->label; ?></td>
-		<td class="edition">
-			<a href="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'product_edit', array('id' => $product->id)); ?>"><img src="<?php echo \Pasteque\get_template_url(); ?>img/edit.png" alt="<?php \pi18n('Edit'); ?>" title="<?php \pi18n('Edit'); ?>"></a>
-		</td>
-	</tr>
->>>>>>> Get rid of par for odd/even, CSS RULES
-<?php
-            }
-        }
-?>
-    </tbody>
-</table>
-<?php
-    }
-}
-} // archive end ?>
 
-<?php
+if ($archive) {
+	foreach ($categories as $category) {
+		$content[0][0] = "";
+		$content[0][1] = \i18n("Product.reference");
+		$content[0][2] = \i18n("Product.label");
+		$i = 1;
+		if (isset($archivesCat[$category->id])) {
+			foreach ($archivesCat[$category->id] as $product) {
+				if (!$product->visible) {
+					if ($product->hasImage) {
+						$imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product&id=" . $product->id;
+					} else {
+						$imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product";
+					}
+					$content[$i][0] = "<img class=\"img img-thumbnail thumbnail\" src=\"?" . $imgSrc . "\">";
+					$content[$i][1] = $product->reference;
+					$content[$i][2] = $product->label;
+					$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'product_edit', array("id" => $product->id)));
+					$content[$i][2] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+					$i++;
+				}
+			}
+		}
+		if(sizeof($content) > 1) {
+			echo \Pasteque\row(\Pasteque\secondaryTitle(\Pasteque\esc_html($category->label) . "&nbsp;-&nbsp;" . \i18n("Archived", PLUGIN_NAME)));
+			echo \Pasteque\row(\Pasteque\standardTable($content));
+		}
+		unset($content);
+	}
+}
+
 if (count($products) == 0) {
-?>
-<div class="alert"><?php \pi18n("No product found", PLUGIN_NAME);?></div>
-<?php
+	echo \Pasteque\errorDiv(\i18n("No product found", PLUGIN_NAME));
 }
 ?>
