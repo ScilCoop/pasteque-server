@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Users module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -26,33 +27,23 @@ $error = null;
 $srv = new \Pasteque\CashesService();
 $sessions = $srv->getAll();
 $crSrv = new \Pasteque\CashRegistersService();
-?>
-<h1><?php \pi18n("Sessions", PLUGIN_NAME); ?></h1>
 
-<h2><?php \pi18n("Active sessions", PLUGIN_NAME); ?></h2>
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("CashRegister.label"); ?></th>
-			<th><?php \pi18n("Session.openDate"); ?></th>
-			<th><?php \pi18n("Session.tickets"); ?></th>
-			<th><?php \pi18n("Session.total"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php foreach ($sessions as $session) {
-    $cashRegister = $crSrv->get($session->cashRegisterId);
-    if (!$session->isClosed()) { ?>
-		<tr>
-			<td><?php echo $cashRegister->label; ?></td>
-			<td><?php \pi18nDatetime($session->openDate); ?></td>
-			<td class="numeric"><?php echo $session->tickets; ?></td>
-			<td class="numeric"><?php \pi18nCurr($session->total); ?></td>
-			<td class="edition">
-				<a href="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'session_details', array('id' => $session->id)); ?>"><img src="<?php echo \Pasteque\get_template_url(); ?>img/edit.png" alt="<?php \pi18n('Edit'); ?>" title="<?php \pi18n('Edit'); ?>"></a>
-			</td>
-		</tr>
-<?php } } ?>
-	</tbody>
-</table>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Active sessions", PLUGIN_NAME)));
+$content[0][] = \i18n("CashRegister.label");
+$content[0][] = \i18n("Session.openDate");
+$content[0][] = \i18n("Session.tickets");
+$content[0][] = \i18n("Session.total");
+$i = 1;
+foreach ($sessions as $session) {
+	$cashRegister = $crSrv->get($session->cashRegisterId);
+	if (!$session->isClosed()) {
+		$content[$i][0] = $cashRegister->label;
+		$content[$i][1] = \i18nDatetime($session->openDate);
+		$content[$i][2] = $session->tickets;
+		$content[$i][3] = \i18nCurr($session->total);
+		$content[$i][4] = "<a href=\"" . \Pasteque\get_module_url_action(PLUGIN_NAME, 'session_details', array('id' => $session->id)) . "\"><img src=\"" . \Pasteque\get_template_url() . "img/edit.png\" alt=\"" . \i18n('Edit') ."\" title=\"" . \i18n('Edit') ."\"></a>";
+		$i++;
+	}
+}
+echo \Pasteque\row(\Pasteque\standardTable($content));

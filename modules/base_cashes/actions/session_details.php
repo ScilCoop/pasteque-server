@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Users module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -33,50 +34,38 @@ $crSrv = new \Pasteque\CashRegistersService();
 $cashRegister = $crSrv->get($session->cashRegisterId);
 
 if ($session->isClosed()) {
-    $title = \i18n("Closed session", PLUGIN_NAME);
+	$title = \i18n("Closed session", PLUGIN_NAME);
 } else {
-    $title = \i18n("Active session", PLUGIN_NAME);
+	$title = \i18n("Active session", PLUGIN_NAME);
 }
-?>
 
-<h1><?php echo($title); ?></h1>
+echo \Pasteque\row(\Pasteque\mainTitle($title));
 
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<th colspan="2"><?php \pi18n("Session"); ?></th>
-	</thead>
-	<tbody>
-		<tr>
-			<td><?php \pi18n("CashRegister.label"); ?></td>
-			<td><?php echo($cashRegister->label); ?></td>
-		</tr>
-		<tr>
-			<td><?php \pi18n("Session.openDate"); ?></td>
-			<td><?php \pi18nDateTime($session->openDate); ?></td>
-		</tr>
-<?php if ($session->isClosed()) { ?>
-		<tr>
-			<td><?php \pi18n("Session.closeDate"); ?></td>
-			<td><?php \pi18nDateTime($session->closeDate); ?></td>
-		</tr>
-<?php } ?>
-		<tr>
-			<td><?php \pi18n("Tickets", PLUGIN_NAME); ?></td>
-			<td><?php echo($zticket->ticketCount); ?></td>
-		</tr>
-		<tr>
-			<td><?php \pi18n("Consolidated sales", PLUGIN_NAME); ?></td>
-			<td><?php \pi18nCurr($zticket->cs); ?></td>
-		</tr>
-	</tbody>
-</table>
+$content[0][] = \i18n("Session");
+$content[0][] = "";
+$content[1][] = \i18n("CashRegister.label");
+$content[1][] = $cashRegister->label;
+$content[2][] = \i18n("Session.openDate");
+$content[2][] = \i18nDateTime($session->openDate);
+$content[3][] = \i18n("Session.closeDate");
+if ($session->isClosed()) {
+	$content[3][] = \i18nDateTime($session->closeDate);
+}
+else {
+	$content[3][] = "";
+}
+$content[4][] = \i18n("Tickets", PLUGIN_NAME);
+$content[4][] = $zticket->ticketCount;
+$content[5][] = \i18n("Consolidated sales", PLUGIN_NAME);
+$content[5][] = \i18nCurr($zticket->cs);
+echo \Pasteque\row(\Pasteque\standardTable($content));
 
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<th colspan="2"><?php \pi18n("Payments", PLUGIN_NAME); ?></th>
-	</thead>
-	<tbody>
-<?php $currSrv = new \Pasteque\CurrenciesService();
+unset($content);
+
+$currSrv = new \Pasteque\CurrenciesService();
+$content[0][] = \i18n("Payments", PLUGIN_NAME);
+$content[0][] = \i18n("Amount", PLUGIN_NAME);
+$i = 0;
 foreach ($zticket->payments as $payment) {
     $currency = $currSrv->get($payment->currencyId);
     if ($currency->isMain) {
@@ -85,43 +74,48 @@ foreach ($zticket->payments as $payment) {
         $amount = $currency->format($payment->currencyAmount) . " ("
                 . \i18nCurr($payment->amount) . ")";
     }
+	$content[$i][] = \i18n($payment->type);
+	$content[$i][] = $amount;
+	$i++;
+}
+if($i == 0) {
+	$content[1][] = \i18n("No payment", PLUGIN_NAME);
+	$content[1][] = "";
+}
+echo \Pasteque\row(\Pasteque\standardTable($content));
+
+unset($content);
+
+$content[0][] = \i18n("Taxes", PLUGIN_NAME);
+$content[0][] = \i18n("Base", PLUGIN_NAME);
+$content[0][] = \i18n("Amount", PLUGIN_NAME);
+$i = 1;
+foreach ($zticket->taxes as $tax) { 
+	$content[$i][] = \Pasteque\TaxesService::getTax($tax["id"])->label;
+	$content[$i][] = \i18nCurr($tax['base']);
+	$content[$i][] = \i18nCurr($tax['amount']);
+	$i++;
+}
+if($i == 1) {
+	$content[1][] = \i18n("No payment", PLUGIN_NAME);
+	$content[1][] = "";
+	$content[1][] = "";
+}
+echo \Pasteque\row(\Pasteque\standardTable($content));
+
+unset($content);
+
+$content[0][] = \i18n("Sales by category", PLUGIN_NAME);
+$content[0][] = \i18n("Amount", PLUGIN_NAME);
+$i = 1;
+foreach ($zticket->catSales as $cat) {
+	$content[$i][] = \i18n(\Pasteque\CategoriesService::get($cat["id"]->label, PLUGIN_NAME));
+	$content[$i][] = $cat["amount"];
+	$i++;
+}
+if($i == 1) {
+	$content[1][] = \i18n("No payment", PLUGIN_NAME);
+	$content[1][] = "";
+}
+echo \Pasteque\row(\Pasteque\standardTable($content));
 ?>
-		<tr>
-			<td><?php \pi18n($payment->type); ?></td>
-			<td class="numeric"><?php echo $amount; ?></td>
-		</tr>
-<?php } ?>
-</table>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th colspan="3"><?php \pi18n("Taxes", PLUGIN_NAME); ?></th>
-		</tr>
-		<tr>
-			<td></td>
-			<td><?php \pi18n("Base", PLUGIN_NAME); ?></td>
-			<td><?php \pi18n("Amount", PLUGIN_NAME); ?></td>
-	</thead>
-	<tbody>
-<?php foreach ($zticket->taxes as $tax) { ?>
-		<tr>
-			<td><?php echo \Pasteque\TaxesService::getTax($tax['id'])->label; ?></td>
-			<td class="numeric"><?php \pi18nCurr($tax['base']); ?></td>
-			<td class="numeric"><?php \pi18nCurr($tax['amount']); ?></td>
-		</tr>
-<?php } ?>
-</table>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<th colspan="2"><?php \pi18n("Sales by category", PLUGIN_NAME); ?></th>
-	</thead>
-	<tbody>
-<?php foreach ($zticket->catSales as $cat) { ?>
-		<tr>
-			<td><?php \pi18n(\Pasteque\CategoriesService::get($cat['id'])->label, PLUGIN_NAME); ?></td>
-			<td class="numeric"><?php \pi18nCurr($cat['amount']); ?></td>
-		</tr>
-<?php } ?>
-</table>
