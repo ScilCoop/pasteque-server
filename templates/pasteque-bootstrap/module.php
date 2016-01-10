@@ -208,7 +208,7 @@ function __tpl_report_input($report, $values) {
 		}
 	}
 	// Send
-	echo "\t\t\t\t\t\t<div class=\"row actions\">" . \PastequeBootstrap\form_send() . "</div>\n";
+	echo "\t\t\t\t\t\t<div class=\"row actions\">" . \Pasteque\form_send() . "</div>\n";
 	echo "\t\t\t\t\t</form>\n";
 	echo "\t\t\t\t</div>\n";
     }
@@ -300,7 +300,7 @@ function __tpl_total_header($report, $run) {
     foreach ($report->getFields() as $field) {
         if (isset($totals[$field])) {
             echo "\t\t\t<th>";
-            if ($totals[$field] === \PastequeBootstrap\Report::TOTAL_AVG) {
+            if ($totals[$field] === \Pasteque\Report::TOTAL_AVG) {
                  echo \i18n("Average") . "<br/>";
             }
             echo $headers[$cmp]. "</th>\n";
@@ -514,7 +514,7 @@ function tpl_js_btn($class, $onclick, $label, $id = NULL, $image_btn = NULL, $al
     }
     $btn .= ">";
     if (isset($image_btn)) {
-        $btn .= "<img src=\"" .\PastequeBootstrap\get_template_url() . "img/" . $image_btn . "\"";
+        $btn .= "<img src=\"" .\Pasteque\get_template_url() . "img/" . $image_btn . "\"";
 
         if (isset($alt)) {
             $btn .= " alt =\"" . $alt . "\"";

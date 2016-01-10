@@ -24,7 +24,19 @@ function counterDiv($content) {
 	return sprintf("<div class=\"alert alert-info\">%s</div>\n",$content);
 }
 
-function errorDiv($content) {
+function infoDiv($content) {
+	return sprintf("<div class=\"alert alert-info\">%s</div>\n",$content);
+}
+
+function successDiv($content) {
+	return sprintf("<div class=\"alert alert-success\">%s</div>\n",$content);
+}
+
+function warningDiv($content) {
 	return sprintf("<div class=\"alert alert-warning\">%s</div>\n",$content);
+}
+
+function errorDiv($content) {
+	return sprintf("<div class=\"alert alert-danger\">%s</div>\n",$content);
 }
 ?>

@@ -65,7 +65,6 @@ require_once(PT::$ABSPATH . "/inc/i18n.php");
 require_once(PT::$ABSPATH . "/inc/i18n_aliases.php");
 require_once(PT::$ABSPATH . "/inc/Report.php");
 require_once(PT::$ABSPATH . "/inc/hooks.php");
-require_once(PT::$ABSPATH . "/inc/forms.php");
 require_once(PT::$ABSPATH . "/inc/PDOBuilder.php");
 require_once(PT::$ABSPATH . "/inc/DB.php");
 require_once(PT::$ABSPATH . "/inc/Installer.php");
