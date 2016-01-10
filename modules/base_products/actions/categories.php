@@ -26,12 +26,12 @@ namespace BaseProducts;
 $message = NULL;
 $error = NULL;
 if (isset($_POST['delete-cat'])) {
-    if (\Pasteque\CategoriesService::deleteCat($_POST['delete-cat'])) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-        $error .= " " . \i18n("Only empty category can be deleted", PLUGIN_NAME);
-    }
+	if (\Pasteque\CategoriesService::deleteCat($_POST['delete-cat'])) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+		$error .= " " . \i18n("Only empty category can be deleted", PLUGIN_NAME);
+	}
 }
 
 $categories = \Pasteque\CategoriesService::getAll();
