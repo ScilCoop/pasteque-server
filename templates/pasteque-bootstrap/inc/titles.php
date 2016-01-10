@@ -29,7 +29,7 @@ function mainTitle($title, $subtitle=null) {
 	return $title;
 }
 
-function subTitle($title, $subtitle=null) {
+function secondaryTitle($title, $subtitle=null) {
 	$title = sprintf("<h2>%s", $title);
 	if($subtitle !== null) {
 		$title .= sprintf(" <small>%s</small>", $subtitle);

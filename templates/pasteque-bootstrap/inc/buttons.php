@@ -44,4 +44,8 @@ function deleteButton($text,$action) {
 function importButton($text,$action) {
 	return sprintf("<a class=\"btn btn-import\" href=\"%s\">%s</a>",$action,$text);
 }
+
+function exportButton($text,$action) {
+	return sprintf("<a class=\"btn btn-export\" href=\"%s\">%s</a>",$action,$text);
+}
 ?>
