@@ -1,0 +1,66 @@
+body {
+	padding-top: 50px;
+	padding-bottom: 25px;
+	padding-left: 25px;
+	padding-right: 25px;
+}
+
+@first-color:	#D6B66F;
+@second-color:	#A3351E;
+@third-color:	#21435C;
+@fourth-color:	#575444;
+@fifth-color:	#08AFEF;
+@sixth-color:	#FBC108;
+
+.navbar > .container-fluid .navbar-brand { padding: 1px; margin-left: 0; }
+.navbar-brand img { height: 100%; }
+h1, h2, h3, h4, h5, h6 {
+	color: #A3351E;
+	font-family: Titillium;
+}
+
+.btn-add {
+	background-color: #A3351E;
+	color: white;
+}
+.btn-import {
+	background-color: #21435C;
+	color: white;
+}
+.btn-export {
+	background-color: #D6B66F;
+}
+.btn-edit {
+	background-color: #08AFEF;
+	color: white;
+}
+.btn-delete {
+	background-color: #575444;
+	color: white;
+}
+
+.spacing-row {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.thumbnail {
+	height: 35px;
+}
+
+.twitter-feed {
+	float: right;
+	margin: 5px 15px;
+	width: 250px;
+}
+
+@font-face {
+	font-family: "Titillium";
+	src: url("../fonts/Titillium-Regular.otf");
+}
+
+@font-face {
+	font-family: "Amble";
+	src: url("../fonts/Amble-Regular.ttf");
+}
+

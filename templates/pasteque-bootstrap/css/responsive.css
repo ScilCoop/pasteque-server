@@ -1,0 +1,103 @@
+/* Big screens and so on */
+.responsive-button {
+	display:none;
+	font-size: 3em;
+	position: absolute;
+	top: 0; left: 0;
+	text-decoration: none;
+	color: #FFF;
+	background-color: #21435C;
+	padding: 0 0.2em;
+}
+.responsive-button:hover {
+	background-color: #A3351E;
+}
+
+/* Tablets */
+@media (max-width: 1280px) {
+	/* Off canvas menu */
+	.responsive-button {
+		display: block;
+	}
+
+	nav[role="menu-container"] {
+		width: 0;
+		height: 100%;
+		overflow: hidden;
+		position: relative;
+		margin-right: 1em;
+		top: 0; left: 0;
+		padding: 0;
+		background-color: white;
+
+		ul li {
+			width:100%;
+		}
+	}
+
+	#content {
+		margin: 0;
+		padding: 0 5dip 10dip 15dip;
+	}
+
+	#menu-container:target {
+		width: 200px;
+	}
+
+	#logo {
+		margin-bottom: 10px;
+	}
+
+	.menu-section {
+		width: 100%;
+		margin: 0;
+	}
+
+	.menu-section-title {
+		padding: 10px 0;
+	}
+
+	.menu {
+		display: none;
+		padding: 0;
+	}
+
+	.menu ul {
+		width: 100%;
+		padding: 0;
+	}
+
+	.menu li {
+		border-top: solid 1px white;
+		margin: 0;
+		padding: 5px 0;
+		width: 100%;
+	}
+
+	.menu li:nth-child(even) {
+		background-color: #EEE;
+	}
+
+	.menu li:nth-child(odd) {
+		background-color: #DDD;
+	}
+
+	#content h1 {
+		margin-left: 2em;
+	}
+
+	/* Tiny twitter feed */
+	.twitter-feed {
+		float: right;
+		margin: 5px 15px;
+		width: 150px;
+	}
+}
+
+/* Phones */
+@media (max-width: 680px) {
+	/* No twitter feed at all */
+	.twitter-feed {
+		display: none;
+	}
+}

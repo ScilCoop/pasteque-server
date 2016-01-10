@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Products module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -34,73 +35,37 @@ if (isset($_POST['delete-cat'])) {
 }
 
 $categories = \Pasteque\CategoriesService::getAll();
-?>
-<h1><?php \pi18n("Categories", PLUGIN_NAME); ?></h1>
 
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Categories", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\addButton(\i18n('Add a category', PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "category_edit"));
+$buttons .= \Pasteque\importButton(\i18n('Import categories', PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "categoriesManagement"));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Information
+\Pasteque\tpl_msg_box($message, $error); 
+//Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d categories", PLUGIN_NAME, count($categories))));
 
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "category_edit"),
-        \i18n('Add a category', PLUGIN_NAME), 'img/btn_add.png');?>
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "categoriesManagement"),
-        \i18n('Import categories', PLUGIN_NAME), 'img/btn_add.png');?>
-
-
-<p><?php \pi18n("%d categories", PLUGIN_NAME, count($categories)); ?></p>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th></th>
-			<th><?php \pi18n("Category.label"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php
-function printCategory($printCategory, $level) {
-        if ($printCategory->hasImage) {
-            $imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=category&id=" . $printCategory->id;
-        } else {
-            $imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=category";
-        }
-        ?>
-                <tr>
-                        <td>
-                        <?php
-                        for($i=0;$i<$level;$i++) {
-                            echo "&nbsp;&nbsp;&nbsp;&nbsp;";
-                        }
-                        ?>
-                        <img class="thumbnail" src="?<?php echo $imgSrc ?>" />
-                        <td><?php echo $printCategory->label; ?></td>
-                        <td class="edition">
-                    <?php \Pasteque\tpl_btn("edition", \Pasteque\get_module_url_action(PLUGIN_NAME,
-                            'category_edit', array("id" => $printCategory->id)), "",
-                            'img/edit.png', \i18n('Edit'), \i18n('Edit'));
-                    ?>
-                                <form action="<?php echo \Pasteque\get_current_url(); ?>" method="post"><?php \Pasteque\form_delete("cat", $printCategory->id, \Pasteque\get_template_url() . 'img/delete.png') ?></form>
-                        </td>
-                </tr>
-        <?php
-        $categories = \Pasteque\CategoriesService::getChildren($printCategory->id);
-        $level++;
-        foreach($categories as $childCategory) {
-            printCategory($childCategory, $level);
-        }
-}
-
-foreach ($categories as $category) {
-    if($category->parentId == "") {
-        printCategory($category, 0); // we start with root categories. As the function is recursive, we don’t need more than this :-)
-    }
-}
-?>
-	</tbody>
-</table>
-<?php
 if (count($categories) == 0) {
-?>
-<div class="alert"><?php \pi18n("No category found", PLUGIN_NAME); ?></div>
-<?php
+	echo \Pasteque\errorDiv(\i18n("No category found", PLUGIN_NAME));
+}
+else {
+	$content[0][0] = \i18n("Category.label");
+	$i = 1;
+	foreach ($categories as $category) {
+		if ($category->hasImage) {
+			$imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=category&id=" . $category->id;
+		} else {
+			$imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=category";
+		}
+		$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'category_edit', array("id" => $category->id)));
+		$btn_group .= \Pasteque\deleteButton(\i18n('Delete', PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-cat=" . $category->id);
+		$content[$i][0] .= "<img class=\"img img-thumbnail thumbnail pull-left\" src=\"?" . $imgSrc . "\">";
+		$content[$i][0] .= $category->label;
+		$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
+	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
 }
 ?>
