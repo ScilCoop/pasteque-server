@@ -38,7 +38,7 @@ function editButton($text,$action) {
 }
 
 function deleteButton($text,$action) {
-	return sprintf("<a class=\"btn btn-delete\" href=\"%s\">%s</a>",$action,$text);
+	return sprintf("<a class=\"btn btn-delete\" onclick=\"return confirm('" . \i18n('confirm') ."');return false;\" href=\"%s\">%s</a>",$action,$text);
 }
 
 function importButton($text,$action) {

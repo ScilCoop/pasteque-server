@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Users module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -25,45 +26,34 @@ $error = null;
 $srv = new \Pasteque\CashRegistersService();
 
 if (isset($_GET['delete-cashreg'])) {
-    if ($srv->delete($_GET['delete-cashreg'])) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-    }
+	if ($srv->delete($_GET['delete-cashreg'])) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+	}
 }
 
 $cashRegs = $srv->getAll();
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Cash registers", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "cashregister_edit"),
+        \i18n('New cash register', PLUGIN_NAME), 'img/btn_add.png');
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
+//Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d cash registers", PLUGIN_NAME, count($cashRegs))));
+
+$content[0][0] = \i18n("CashRegister.label");
+
+$i = 1;
+foreach ($cashRegs as $cashReg) {
+	$btn_group = \Pasteque\editButton(\i18n("Edit", PLUGIN_NAME), \PAsteque\get_module_url_action(PLUGIN_NAME, "cashregister_edit", array("id" => $cashReg->id)));
+	$btn_group .= \Pasteque\deleteButton(\i18n("Delete", PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-cashreg=". $cashReg->id);
+	$content[$i][0] = $cashReg->label;
+	$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+	$i++;
+}
+echo \Pasteque\row(\Pasteque\standardTable($content));
 ?>
-<h1><?php \pi18n("Cash registers", PLUGIN_NAME); ?></h1>
-
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
-
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "cashregister_edit"),
-        \i18n('New cash register', PLUGIN_NAME), 'img/btn_add.png');?>
-
-<p><?php \pi18n("%d cash registers", PLUGIN_NAME, count($cashRegs)); ?></p>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("CashRegister.label"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php foreach ($cashRegs as $cashReg) { ?>
-		<tr>
-			<td><?php echo $cashReg->label; ?></td>
-			<td class="edition">
-                    <?php \Pasteque\tpl_btn('btn-edition', \Pasteque\get_module_url_action(
-                            PLUGIN_NAME, 'cashregister_edit', array("id" => $cashReg->id)), "",
-                            'img/edit.png', \i18n('Edit'), \i18n('Edit'));
-                    ?>
-                    <?php \Pasteque\tpl_btn('btn-delete', \Pasteque\get_current_url() . "&delete-cashreg=" . $cashReg->id, "",
-                            'img/delete.png', \i18n('Delete'), \i18n('Delete'), true);
-                    ?>
-			</td>
-		</tr>
-<?php } ?>
-	</tbody>
-</table>

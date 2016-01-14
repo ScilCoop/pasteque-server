@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office
 //
-//    Copyright (C) 2015 Scil (http://scil.coop)
+//    Copyright (C) 2015-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -20,8 +21,10 @@
 
 namespace BaseBackup;
 
-?><h1><?php \pi18n("Backup", PLUGIN_NAME); ?></h1>
-<div class="hint"><p><?php \pi18n("Backup_help", PLUGIN_NAME); ?></p></div><?php
+//Title
+\Pasteque\row(\Pasteque\mainTitle(\i18n("Backup", PLUGIN_NAME)));
+//Hint
+\Pasteque\row(\Pasteque\infoDiv(\i18n("Backup_help", PLUGIN_NAME)));
 
 $user_id        = \Pasteque\get_user_id();
 $dbhost = \Pasteque\get_db_host($user_id);
@@ -58,6 +61,5 @@ if($filename == "") {
 
 }
 if(file_exists($filename)) {
-    \Pasteque\tpl_btn('btn bt_export ', $filename,
-        \i18n('Download backup', PLUGIN_NAME), 'img/btn_add.png');
+    echo \Pasteque\importButton(\i18n('Download backup', PLUGIN_NAME), $filename);
 }

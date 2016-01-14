@@ -75,30 +75,28 @@ foreach ($products as $product) {
 
 //Title
 echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Products", PLUGIN_NAME)));
-//Buttons
-$buttons = \Pasteque\addButton(\i18n("Add a product", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "product_edit"));
-$buttons .= \Pasteque\importButton(\i18n("Import products", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "productsManagement"));
-$buttons .= \Pasteque\exportButton(\i18n("Export products", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME,"products_export"));
-echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
-//Information
-\Pasteque\tpl_msg_box($message, $error); ?>
+?>
 
-<div id="search">
-<div class="title"><?php \pi18n("Search"); ?></div>
-<h5><? \pi18n("by category", PLUGIN_NAME); ?></h5>
+<div id="search" style="border: solid 1px black; border-radius: 3px; float:right; background-color:#eee;padding:5px;">
+<h5><? \pi18n("Search"); ?> <? \pi18n("by category", PLUGIN_NAME); ?></h5>
 <?php
     \Pasteque\tpl_form('select', 'category', \Pasteque\CategoriesService::getAll());
 ?>
 </div>
 
 <?php
+//Buttons
+$buttons = \Pasteque\addButton(\i18n("Add a product", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "product_edit"));
+$buttons .= \Pasteque\importButton(\i18n("Import products", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "productsManagement"));
+$buttons .= \Pasteque\exportButton(\i18n("Export products", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME,"products_export"));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
 //Counter
 echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d products", PLUGIN_NAME, $totalProducts)));
-?></p>
 
-<?php \Pasteque\tpl_pagination($totalProducts,$range,$start); ?>
+\Pasteque\tpl_pagination($totalProducts,$range,$start);
 
-<?php
 $archive = false;
 foreach ($categories as $category) {
 	if (isset($prdCat[$category->id])) {

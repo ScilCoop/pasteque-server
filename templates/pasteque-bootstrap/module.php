@@ -33,18 +33,18 @@ function tpl_open() {
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="utf-8">
-	<title><?php \pi18n("Pastèque"); ?></title>
-	<link rel="icon" type="image/png" href="templates/pt2.0/img/icon.png">
-	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/css/bootstrap/css/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/css/bootstrap/css/bootstrap-datepicker.min.css">
-	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/css/style.css">
-	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/css/catalog.css">
-	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>/css/stock.css">
-	<script type="text/javascript" src="<?php echo get_template_url(); ?>/js/jquery-1.9.1.min.js"></script>
-	<script type="text/javascript" src="<?php echo get_template_url(); ?>/js/jquery-ui-1.10.4.custom.min.js"></script>
-	<script type="text/javascript" src="<?php echo get_template_url(); ?>/js/jquery-tablesorter.min.js"></script>
-	<script type="text/javascript" src="<?php echo get_template_url(); ?>/css/bootstrap/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="<?php echo get_template_url(); ?>/css/bootstrap/js/bootstrap-datepicker.min.js"></script>
+	<title><?php \pi18n("Pastèque"); ?> :: <?php \pi18n("Administration"); ?></title>
+	<link rel="icon" type="image/png" href="<?php echo get_template_url(); ?>img/icon.png">
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>css/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>css/bootstrap/css/bootstrap-datepicker.min.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>css/style.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>css/catalog.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>css/stock.css">
+	<script type="text/javascript" src="<?php echo get_template_url(); ?>js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="<?php echo get_template_url(); ?>js/jquery-ui-1.10.4.custom.min.js"></script>
+	<script type="text/javascript" src="<?php echo get_template_url(); ?>js/jquery-tablesorter.min.js"></script>
+	<script type="text/javascript" src="<?php echo get_template_url(); ?>css/bootstrap/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<?php echo get_template_url(); ?>css/bootstrap/js/bootstrap-datepicker.min.js"></script>
 	<script type="text/javascript" src="?<?php echo \Pasteque\PT::URL_ACTION_PARAM; ?>=img&w=js&id=js/pasteque.js.php"></script>
 </head>
 <body>
@@ -72,24 +72,24 @@ function tpl_msg_box($info, $error) {
         if (is_array($info)) {
             $mess_i = "";
             foreach ($info as $m_info) {
-                $mess_i .= $m_info . "<br/>";
+                $mess_i .= $m_info . "<br>";
             }
             $info = $mess_i;
         }
         if ($info != "") {
-            echo "<div class=\"message\">" . $info . "</div>\n";
+            echo "<div class=\"alert alert-success\">" . $info . "</div>\n";
         }
     }
     if ($error !== NULL) {
         if (is_array($error)) {
             $mess_e = "";
             foreach ($error as $m_err) {
-                $mess_e .= $m_err . "<br/>";
+                $mess_e .= $m_err . "<br>";
             }
             $error = $mess_e;
         }
         if($error != "") {
-            echo "<div class=\"error\">" . $error . "</div>\n";
+            echo "<div class=\"alert alert-danger\">" . $error . "</div>\n";
         }
     }
 }
