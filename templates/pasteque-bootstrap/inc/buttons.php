@@ -48,4 +48,16 @@ function importButton($text,$action) {
 function exportButton($text,$action) {
 	return sprintf("<a class=\"btn btn-export\" href=\"%s\">%s</a>",$action,$text);
 }
+
+function jsAddButton($text,$action) {
+	return sprintf("<a class=\"btn btn-add\" onclick=\"%s\">%s</a>",$action,$text);
+}
+
+function jsEditButton($text,$action) {
+	return sprintf("<a class=\"btn btn-edit\" onclick=\"%s\">%s</a>",$action,$text);
+}
+
+function jsDeleteButton($text,$action) {
+	return sprintf("<a class=\"btn btn-delete\" onclick=\"%s\">%s</a>",$action,$text);
+}
 ?>

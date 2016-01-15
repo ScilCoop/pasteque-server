@@ -1,0 +1,20 @@
+.floor {
+	background-color: lightgray;
+	border: solid 1px black;
+	position: relative;
+	width: 640px;
+	height: 480px;
+	overflow: hidden;
+}
+
+.place {
+	background-color: white;
+	position: absolute;
+	border: solid 1px black;
+	z-index: 2;
+}
+
+.ui-draggable-dragging {
+	z-index: 3;
+}
+

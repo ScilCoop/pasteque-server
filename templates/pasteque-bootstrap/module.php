@@ -40,6 +40,7 @@ function tpl_open() {
 	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>css/style.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>css/catalog.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>css/stock.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_url(); ?>css/restaurant.css">
 	<script type="text/javascript" src="<?php echo get_template_url(); ?>js/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="<?php echo get_template_url(); ?>js/jquery-ui-1.10.4.custom.min.js"></script>
 	<script type="text/javascript" src="<?php echo get_template_url(); ?>js/jquery-tablesorter.min.js"></script>

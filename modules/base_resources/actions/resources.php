@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Resources module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -26,42 +27,28 @@ if (isset($_GET['delete-res'])) {
 }
 
 $resources = $resSrv->getAll();
-?>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Resources", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\addButton(\i18n("Add a resource", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "resource_edit"));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Informations
+\Pasteque\tpl_msg_box($message, $error);
+//Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d resources", PLUGIN_NAME, count($resources))));
 
-<h1><?php \pi18n("Resources", PLUGIN_NAME); ?></h1>
-
-<?php \Pasteque\tpl_btn('btn-add', \Pasteque\get_module_url_action(PLUGIN_NAME, "resource_edit"),
-        \i18n('Add a resource', PLUGIN_NAME), 'img/btn_add.png');?>
-
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
-
-<p><?php \pi18n("%d resources", PLUGIN_NAME, count($resources)); ?></p>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("Resource.label"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<ul class="resources-list">
-<?php
-foreach ($resources as $res) { ?>
-	<tr>
-		<td><?php echo $res->label; ?></td>
-		<td class="edition">
-                    <?php \Pasteque\tpl_btn('btn-edition', \Pasteque\get_module_url_action(
-                            PLUGIN_NAME, 'resource_edit', array("id" => $res->id)), "",
-                            'img/edit.png', \i18n('Edit'), \i18n('Edit'));
-                    ?>
-                    <?php \Pasteque\tpl_btn('btn-delete', \Pasteque\get_current_url() . "&delete-resource=" . $res->id, "",
-                            'img/delete.png', \i18n('Delete'), \i18n('Delete'), true);
-                    ?>
-		</td>
-	</tr>
-<?php
+if (count($resources) == 0) {
+	echo \Pasteque\errorDiv(\i18n("No resource found", PLUGIN_NAME));
 }
-?>
-	</tbody>
-</table>
+else {
+	$content[0][0] = \i18n("Resource.label");
+	$i = 1;
+	foreach ($resources as $res) {
+		$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'resource_edit', array("id" => $res->id)));
+		$btn_group .= \Pasteque\deleteButton(\i18n('Delete', PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-resource=" . $res->id);
+		$content[$i][0] = $res->label;
+		$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
+	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
+}
