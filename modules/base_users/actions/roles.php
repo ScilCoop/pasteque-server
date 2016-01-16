@@ -1,7 +1,8 @@
 <?php
-//    Pastèque Web back office, Users module
+//    Pastèque Web back office, Roles module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -22,44 +23,34 @@ namespace BaseUsers;
 
 $srv = new \Pasteque\RolesService();
 if (isset($_GET['delete-role'])) {
-    $srv->delete($_GET['delete-role']);
+	$srv->delete($_GET['delete-role']);
 }
 
 $roles = $srv->getAll();
-?>
-<h1><?php \pi18n("Users", PLUGIN_NAME); ?></h1>
 
-<p><a class="btn" href="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'role_edit'); ?>"><img src="<?php echo \Pasteque\get_template_url(); ?>img/btn_add.png" /><?php \pi18n("Add a role", PLUGIN_NAME); ?></a></p>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Roles", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\addButton(\i18n("Add a role", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "role_edit"));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
+// Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d roles", PLUGIN_NAME, count($roles))));
 
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
-
-<p><?php \pi18n("%d roles", PLUGIN_NAME, count($roles)); ?></p>
-
-<table cellspacing="0" cellpadding="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("Role.name"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php
-foreach ($roles as $role) {
-?>
-	<tr>
-		<td><?php echo $role->name; ?></td>
-		<td class="edition">
-                    <?php \Pasteque\tpl_btn('btn-edition', \Pasteque\get_module_url_action(
-                            PLUGIN_NAME, 'role_edit', array("id" => $role->id)), "",
-                            'img/edit.png', \i18n('Edit'), \i18n('Edit'));
-                    ?>
-                    <?php \Pasteque\tpl_btn('btn-delete', \Pasteque\get_current_url() . "&delete-role=" . $role->id, "",
-                            'img/delete.png', \i18n('Delete'), \i18n('Delete'), true);
-                    ?>
-		</td>
-	</tr>
-<?php
+if(count($roles) == 0) {
+	echo \Pasteque\errorDiv(\i18n("No role found", PLUGIN_NAME));
+}
+else {
+	$content[0][0] = \i18n("Role.name");
+	$i = 1;
+	foreach ($roles as $role) {
+		$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'role_edit', array("id" => $role->id)));
+		$btn_group .= \Pasteque\deleteButton(\i18n('Delete', PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-role=" . $role->id);
+		$content[$i][0] = $role->name;
+		$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
+	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
 }
 ?>
-	</tbody>
-</table>
