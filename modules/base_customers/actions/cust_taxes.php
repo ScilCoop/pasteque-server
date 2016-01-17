@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Customers module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -21,35 +22,32 @@
 namespace BaseCustomers;
 
 if (isset($_POST['delete-custtax'])) {
-    \Pasteque\CustTaxCatsService::delete($_POST['delete-custtax']);
+	\Pasteque\CustTaxCatsService::delete($_POST['delete-custtax']);
 }
-
 $custTaxCats = \Pasteque\CustTaxCatsService::getAll();
-?>
-<h1><?php \pi18n("Customer's tax categories", PLUGIN_NAME); ?></h1>
 
-<p><a class="btn" href="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'cust_tax_edit'); ?>"><img src="<?php echo \Pasteque\get_template_url(); ?>img/btn_add.png" /><?php \pi18n("Add a tax category", PLUGIN_NAME); ?></a></p>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Customer's tax categories", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\addButton(\i18n("Add a tax category", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "cust_tax_edit"));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
+//Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d tax categories", PLUGIN_NAME, count($custTaxCats))));
 
-<table cellspacing="0" cellpadding="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("CustTaxCat.label"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php
-foreach ($custTaxCats as $custTax) {
-?>
-	<tr>
-		<td><?php echo $custTax->label; ?></td>
-		<td class="edition">
-			<a href="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'cust_tax_edit', array('id' => $custTax->id)); ?>"><img src="<?php echo \Pasteque\get_template_url(); ?>img/edit.png" alt="<?php \pi18n('Edit'); ?>" title="<?php \pi18n('Edit'); ?>"></a>
-			<form action="<?php echo \Pasteque\get_current_url(); ?>" method="post"><?php \Pasteque\form_delete("custtax", $custTax->id, \Pasteque\get_template_url() . 'img/delete.png') ?></form>
-		</td>
-	</tr>
-<?php
+if (count($custTaxCats) == 0) {
+	echo \Pasteque\errorDiv(\i18n("No customer tax found", PLUGIN_NAME));
+}
+else {
+	$content[0][0] = \i18n("CustTaxCat.label");
+	$i = 1;
+	foreach ($custTaxCats as $custTaxCat) {
+		$btn_group = \Pasteque\editButton(\i18n("Edit", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "cust_tax_edit", array("id" => $custTaxCat->id)));
+		$content[$i][0] = $custTaxCat->label;
+		$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
+	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
 }
 ?>
-	</tbody>
-</table>

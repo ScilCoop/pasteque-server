@@ -62,4 +62,5 @@ else {
 		$content[$i][0] .= \Pasteque\buttonGroup($btn_group,"pull-right");
 		$i++;
 	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
 }

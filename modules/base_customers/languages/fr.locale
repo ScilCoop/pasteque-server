@@ -4,10 +4,13 @@
 "Add a customer": "Ajouter un client",
 "Edit a customer": "Modification d'un client",
 "%d customers": "%d clients",
+"%d tax categories": "% catégories de taxe client",
 "Keys": "Clés",
 "Debt": "Dette",
 "Miscellaneous": "Divers",
 "Personnal data": "Informations personnelles",
+"No customer found": "Pas de client",
+"No customer tax found": "Pas de catégorie de taxe client",
 
 "Customer taxes": "Taxes client",
 "Customer's tax categories": "Catégories de taxes client",
