@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Payment modes module
 //
-//    Copyright (C) 2015 Scil (http://scil.coop)
+//    Copyright (C) 2015-2016 Scil (http://scil.coop)
+//       Pierre Ducroquet, Philippe Pary
 //
 //    This file is part of Pastèque.
 //
@@ -26,56 +27,44 @@ $message = NULL;
 $error = NULL;
 $modeSrv = new \Pasteque\PaymentModesService();
 if (isset($_POST['toggle-paymentmode'])) {
-    if ($modeSrv->toggle($_POST['toggle-paymentmode'])) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-    }
+	if ($modeSrv->toggle($_POST['toggle-paymentmode'])) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+	}
 }
 
 $paymentModes = $modeSrv->getAll();
-?>
-<h1><?php \pi18n("Payment modes", PLUGIN_NAME); ?></h1>
 
-<br />
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Payement modes", PLUGIN_NAME)));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
 
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
+$content[0][0] = \i18n("PaymentMode.code");
+$content[0][1] = \i18n("PaymentMode.label");
+$content[0][2] = \i18n("PaymentMode.backLabel");
+$content[0][3] = "";
 
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("PaymentMode.code"); ?></th>
-			<th><?php \pi18n("PaymentMode.label"); ?></th>
-			<th><?php \pi18n("PaymentMode.backLabel"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php
+$i = 1;
 foreach ($paymentModes as $paymentMode) {
-    if ($paymentMode->system) {
-        continue;
-    }
-?>
-	<tr>
-		<td><?php echo $paymentMode->code; ?></td>
-		<td><?php echo $paymentMode->label; ?></td>
-		<td><?php echo $paymentMode->backLabel; ?></td>
-		<td class="edition">
-                    <form action="<?php echo \Pasteque\get_current_url(); ?>" method="post" enctype="multipart/form-data">
-                        <input type="hidden" name="toggle-paymentmode" value="<?php echo $paymentMode->id; ?>" />
-<?php
-    $action = \i18n("Enable");
-    if ($paymentMode->active === true)
-        $action = \i18n("Disable");
-?>
-                        <input type="submit" value="<?php echo $action; ?>" />
-                    </form>
-                </td>
-	</tr>
-<?php
+	if ($paymentMode->system) {
+		continue;
+	}
+	$content[$i][0] = $paymentMode->code;
+	$content[$i][1] = $paymentMode->label;
+	$content[$i][2] = $paymentMode->backLabel;
+	$content[$i][3] = "<form action=\"" . \Pasteque\get_current_url() . "\" method=\"post\" enctype=\"multipart/form-data\">\n<input type=\"hidden\" name=\"toggle-paymentmode\" value=\"" . $paymentMode->id ."\">";
+	if ($paymentMode->active === true) {
+		$action = \i18n("Disable");
+		$content[$i][3] .= \Pasteque\form_button($action,"btn-delete");
+	}
+	else {
+		$action = \i18n("Enable");
+		$content[$i][3] .= \Pasteque\form_button($action);
+	}
+	$content[$i][3] .= "</form>";
+	$i++;
 }
+echo \Pasteque\row(\Pasteque\standardTable($content));
 ?>
-	</tbody>
-</table>
-

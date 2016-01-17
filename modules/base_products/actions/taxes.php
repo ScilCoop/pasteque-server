@@ -26,11 +26,11 @@ namespace BaseProducts;
 $message = NULL;
 $error = NULL;
 if (isset($_GET['delete-taxcat'])) {
-    if (\Pasteque\TaxesService::deleteCat($_GET['delete-taxcat'])) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to delete tax. Tax cannot be deleted when in use.", PLUGIN_NAME);
-    }
+	if (\Pasteque\TaxesService::deleteCat($_GET['delete-taxcat'])) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to delete tax. Tax cannot be deleted when in use.", PLUGIN_NAME);
+	}
 }
 
 $taxes = \Pasteque\TaxesService::getAll();

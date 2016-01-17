@@ -22,9 +22,9 @@
 namespace BaseBackup;
 
 //Title
-\Pasteque\row(\Pasteque\mainTitle(\i18n("Backup", PLUGIN_NAME)));
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Backup", PLUGIN_NAME)));
 //Hint
-\Pasteque\row(\Pasteque\infoDiv(\i18n("Backup_help", PLUGIN_NAME)));
+echo \Pasteque\row(\Pasteque\infoDiv(\i18n("Backup_help", PLUGIN_NAME)));
 
 $user_id        = \Pasteque\get_user_id();
 $dbhost = \Pasteque\get_db_host($user_id);
@@ -39,27 +39,26 @@ $dbport = \Pasteque\get_db_port($user_id);
 // Tip: create a firewall rule to ban bruteforce on this randomstring
 $dir = opendir("cache");
 while(($f = readdir($dir)) != false) {
-    if(preg_match("/pasteque-[0-9]{8}-" . $database . "-.[a-z0-9]*.sql.gz/",$f) == 1) {
-        // old file's name (old date, old random string)
-        $filename = "cache/" . $f;
-        if(time() - filemtime($filename) > 86400) {
-            $cmd = "rm " . $filename;
-            exec($cmd);
-            // new file's name (new date, new random string)
-            $filename       = "cache/pasteque-" . date("Ymd") . "-" . $database . "-" . md5(time() . rand(0,getrandmax())) . ".sql.gz";
-            $cmd = "mysqldump -u " . $dbuser . " --password=" . $dbpasswd . " " . $database ." --port=" . $dbport . "|gzip -c > " . $filename;
-            exec($cmd);
-        }
-        break;
-    }
+	if(preg_match("/pasteque-[0-9]{8}-" . $database . "-.[a-z0-9]*.sql.gz/",$f) == 1) {
+		// old file's name (old date, old random string)
+		$filename = "cache/" . $f;
+		if(time() - filemtime($filename) > 86400) {
+			$cmd = "rm " . $filename;
+			exec($cmd);
+			// new file's name (new date, new random string)
+			$filename       = "cache/pasteque-" . date("Ymd") . "-" . $database . "-" . md5(time() . rand(0,getrandmax())) . ".sql.gz";
+			$cmd = "mysqldump -u " . $dbuser . " --password=" . $dbpasswd . " " . $database ." --port=" . $dbport . "|gzip -c > " . $filename;
+			exec($cmd);
+		}
+		break;
+	}
 }
 // We didn’t find a file, we generate one
 if($filename == "") {
-    $filename       = "cache/pasteque-" . date("Ymd") . "-" . $database . "-" . md5(time() . rand(0,getrandmax())) . ".sql.gz";
-    $cmd = "mysqldump -u " . $dbuser . " --password=" . $dbpasswd . " " . $database ." --port=" . $dbport . "|gzip -c > " . $filename;
-    exec($cmd);
-
+	$filename       = "cache/pasteque-" . date("Ymd") . "-" . $database . "-" . md5(time() . rand(0,getrandmax())) . ".sql.gz";
+	$cmd = "mysqldump -u " . $dbuser . " --password=" . $dbpasswd . " " . $database ." --port=" . $dbport . "|gzip -c > " . $filename;
+	exec($cmd);
 }
 if(file_exists($filename)) {
-    echo \Pasteque\importButton(\i18n('Download backup', PLUGIN_NAME), $filename);
+	echo \Pasteque\importButton(\i18n('Download backup', PLUGIN_NAME), $filename);
 }

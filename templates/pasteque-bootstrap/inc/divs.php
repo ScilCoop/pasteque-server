@@ -20,23 +20,57 @@
 //    along with Pastèque.  If not, see <http://www.gnu.org/licenses/>.
 namespace Pasteque;
 
-function counterDiv($content) {
-	return sprintf("<div class=\"alert alert-info\">%s</div>\n",$content);
+function vanillaDiv($content, $id=null) {
+	if($id === null) {
+		return sprintf("<div>%s</div>\n",$content);
+	}
+	else {
+		return sprintf("<div id=\"%s\">%s</div>\n",$id,$content);
+	}
 }
 
-function infoDiv($content) {
-	return sprintf("<div class=\"alert alert-info\">%s</div>\n",$content);
+function counterDiv($content, $id=null) {
+	if($id === null) {
+		return sprintf("<div class=\"alert alert-info\">%s</div>\n",$content);
+	}
+	else {
+		return sprintf("<div id=\"%s\" class=\"alert alert-info\">%s</div>\n",$id,$content);
+	}
 }
 
-function successDiv($content) {
-	return sprintf("<div class=\"alert alert-success\">%s</div>\n",$content);
+function infoDiv($content, $id=null) {
+	if($id === null) {
+		return sprintf("<div class=\"alert alert-info\">%s</div>\n",$content);
+	}
+	else {
+		return sprintf("<div id=\"%s\" class=\"alert alert-info\">%s</div>\n",$id,$content);
+	}
 }
 
-function warningDiv($content) {
-	return sprintf("<div class=\"alert alert-warning\">%s</div>\n",$content);
+function successDiv($content, $id=null) {
+	if($id === null) {
+		return sprintf("<div class=\"alert alert-success\">%s</div>\n",$content);
+	}
+	else {
+		return sprintf("<div id=\"%s\" class=\"alert alert-success\">%s</div>\n",$id,$content);
+	}
 }
 
-function errorDiv($content) {
-	return sprintf("<div class=\"alert alert-danger\">%s</div>\n",$content);
+function warningDiv($content, $id=null) {
+	if($id === null) {
+		return sprintf("<div class=\"alert alert-warning\">%s</div>\n",$content);
+	}
+	else {
+		return sprintf("<div id=\"%s\" class=\"alert alert-warning\">%s</div>\n",$id,$content);
+	}
+}
+
+function errorDiv($content, $id=null) {
+	if($id === null) {
+		return sprintf("<div class=\"alert alert-danger\">%s</div>\n",$content);
+	}
+	else {
+		return sprintf("<div id=\"%s\" class=\"alert alert-danger\">%s</div>\n",$id,$content);
+	}
 }
 ?>

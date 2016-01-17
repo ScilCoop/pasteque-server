@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Products module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -25,75 +26,46 @@ namespace ProductProviders;
 $message = NULL;
 $error = NULL;
 if (isset($_POST['delete-prov'])) {
-    if (\Pasteque\providersService::deleteprov($_POST['delete-prov'])) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-        $error .= " " . \i18n("Only empty provider can be deleted", PLUGIN_NAME);
-    }
+	if (\Pasteque\providersService::deleteprov($_POST['delete-prov'])) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+		$error .= " " . \i18n("Only empty provider can be deleted", PLUGIN_NAME);
+	}
 }
 
 $providers = \Pasteque\providersService::getAll();
-?>
-<h1><?php \pi18n("Providers", PLUGIN_NAME); ?></h1>
 
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Providers", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\addButton(\i18n('Add a provider', PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "provider_edit"));
+$buttons .= \Pasteque\importButton(\i18n('Import providers', PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "providersManagement"));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
+//Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d providers", PLUGIN_NAME, count($providers))));
 
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "provider_edit"),
-        \i18n('Add a provider', PLUGIN_NAME), 'img/btn_add.png');?>
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "providersManagement"),
-        \i18n('Import providers', PLUGIN_NAME), 'img/btn_add.png');?>
-
-
-<p><?php \pi18n("%d providers", PLUGIN_NAME, count($providers)); ?></p>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th></th>
-			<th><?php \pi18n("Provider.label"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php
-function printprovider($printprovider, $level) {
-        if ($printprovider->hasImage) {
-            $imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=provider&id=" . $printprovider->id;
-        } else {
-            $imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=provider";
-        }
-        ?>
-                <tr>
-                        <td>
-                        <?php
-                        for($i=0;$i<$level;$i++) {
-                            echo "&nbsp;&nbsp;&nbsp;&nbsp;";
-                        }
-                        ?>
-                        <img class="thumbnail" src="?<?php echo $imgSrc ?>" />
-                        <td><?php echo $printprovider->label; ?></td>
-                        <td class="edition">
-                    <?php \Pasteque\tpl_btn("edition", \Pasteque\get_module_url_action(PLUGIN_NAME,
-                            'provider_edit', array("id" => $printprovider->id)), "",
-                            'img/edit.png', \i18n('Edit'), \i18n('Edit'));
-                    ?>
-                                <form action="<?php echo \Pasteque\get_current_url(); ?>" method="post"><?php \Pasteque\form_delete("prov", $printprovider->id, \Pasteque\get_template_url() . 'img/delete.png') ?></form>
-                        </td>
-                </tr>
-        <?php
-}
-
-foreach ($providers as $provider) {
-    printprovider($provider, 0);
-}
-?>
-	</tbody>
-</table>
-<?php
 if (count($providers) == 0) {
-?>
-<div class="alert"><?php \pi18n("No provider found", PLUGIN_NAME); ?></div>
-<?php
+	echo \Pasteque\errorDiv(\i18n("No provider found", PLUGIN_NAME));
+}
+else {
+	$content[0][0] = \i18n("Provider.label");
+	$i = 1;
+	foreach ($providers as $provider) {
+		if ($provider->hasImage) {
+			$imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=provider&id=" . $provider->id;
+		} else {
+			$imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=provider";
+		}
+		$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'provider_edit', array("id" => $provider->id)));
+		$btn_group .= \Pasteque\deleteButton(\i18n('Delete', PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-cat=" . $provider->id);
+		$content[$i][0] .= "<img class=\"img img-thumbnail thumbnail pull-left\" src=\"?" . $imgSrc . "\">";
+		$content[$i][0] .= $provider->label;
+		$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
+	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
 }
 ?>

@@ -22,6 +22,6 @@ namespace Pasteque;
 
 function row($content) {
 	$row = sprintf("<div class=\"row spacing-row\">%s</div>\n",$content);
-	echo $row;
+	return $row;
 }
 ?>

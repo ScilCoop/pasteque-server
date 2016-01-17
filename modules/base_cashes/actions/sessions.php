@@ -42,7 +42,7 @@ foreach ($sessions as $session) {
 		$content[$i][1] = \i18nDatetime($session->openDate);
 		$content[$i][2] = $session->tickets;
 		$content[$i][3] = \i18nCurr($session->total);
-		$content[$i][4] = "<a href=\"" . \Pasteque\get_module_url_action(PLUGIN_NAME, 'session_details', array('id' => $session->id)) . "\"><img src=\"" . \Pasteque\get_template_url() . "img/edit.png\" alt=\"" . \i18n('Edit') ."\" title=\"" . \i18n('Edit') ."\"></a>";
+		$content[$i][4] = \Pasteque\editButton(\i18n("Edit"), \Pasteque\get_module_url_action(PLUGIN_NAME, 'session_details', array('id' => $session->id)));
 		$i++;
 	}
 }

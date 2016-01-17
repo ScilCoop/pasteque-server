@@ -35,14 +35,50 @@ function esc_js($value) {
 
 function form_hidden($form_id, $object, $field) {
 	if ($object != NULL && isset($object->{$field})) {
-		return '<input type="hidden" name="' . esc_attr($field) . '" value="'
+		return "<input type=\"hidden\" name=\"" . esc_attr($field) . "\" value=\""
 			. esc_attr($object->{$field}) . "\"/>\n";
 	}
 }
 
 function form_value_hidden($form_id, $name, $value) {
-	return '<input type="hidden" name="' . esc_attr($name)
-		. '" value="' . esc_attr($value) . "\"/>\n";
+	return "<input type=\"hidden\" name=\"" . esc_attr($name)
+		. "\" value=\"" . esc_attr($value) . "\"/>\n";
+}
+
+function form_date($id, $value, $label=null, $format=null, $class=null) {
+	$ret = "";
+	if($label !== null) {
+		$ret = "<label for=\"". $id ."\">" . $label . "</label>\n";
+	}
+	$ret .= "<div data-date-format=\"";
+	if($format !== null) {
+		$ret .= $format;
+	}
+	else {
+		$ret .= "yyyy-mm-dd";
+	}
+	$ret .= "\" class=\"input-group date";
+	if($class !== null) {
+		$ret .= $class;
+	}
+	$ret .= "\">\n";
+	$ret .= "\t<input type=\"text\" class=\"form-control\" name=\"";
+	$ret .= $id . "\" id=\"" . $id . "\" value=\"" . $value . "\">\n";
+	$ret .= "\t<div class=\"input-group-addon\">\n";
+	$ret .= "\t\t<span class=\"glyphicon glyphicon-th\"></span>\n";
+	$ret .= "\t</div>\n";
+	$ret .= "</div>\n";
+	return $ret;
+}
+
+function form_file($id, $name="file", $label=null, $class=null) {
+	$ret = "";
+	if($label !== null) {
+		$ret = "<label for=\"". $id ."\">" . $label . "</label>\n";
+	}
+	$ret .= "<input id=\"" . $id . "\" type=\"file\" name=\"" . $name . "\">\n";
+	return $ret;
+
 }
 
 function form_input($form_id, $class, $object, $field, $type, $args = array()) {
@@ -244,19 +280,17 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 /** Create a select with given labels. For relation in a model use form_input
  * with type pick */
 function form_select($id, $label, $values, $labels, $currentValue) {
-	$ret =  "<div class=\"row\">\n";
-	$ret .=  "<label for=\"" . esc_attr($id) ."\">" . esc_html($label) . "</label>\n";
+	$ret =  "<label for=\"" . esc_attr($id) ."\">" . esc_html($label) . "</label>\n";
 	$ret .=  "<select id=\"" . esc_attr($id) . "\" name=\"" . esc_attr($id) . "\">\n";
 	for ($i = 0; $i < count($values); $i++) {
 		$selected = "";
 		if ($values[$i] === $currentValue) {
 			$selected = ' selected="true"';
 		}
-		$ret .=  '<option value="' . esc_attr($values[$i]) . '"' . $selected . '>'
-			. esc_html($labels[$i]) . '</option>\n';
+		$ret .=  "<option value=\"" . esc_attr($values[$i]) . "\"" . $selected . ">"
+			. esc_html($labels[$i]) . "</option>\n";
 	}
 	$ret .=  "</select>\n";
-	$ret .=  "</div>\n";
 	return $ret;
 }
 
@@ -271,8 +305,17 @@ function form_fieldset($legend,$content) {
 	return sprintf("<fieldset>\n\t<legend>%s</legend>\n%s\n</fieldset>\n",$legend,$content);
 }
 
+function form_button($text,$class=null) {
+	if($class !== null) {
+		return "<button class=\"btn btn-primary btn-send " . $class . "\" type=\"submit\">" . $text . "</button>\n";
+	}
+	else {
+		return "<button class=\"btn btn-primary btn-send\" type=\"submit\">" . $text . "</button>\n";
+	}
+}
+
 function form_send() {
-	return '<button class="btn btn-primary btn-send" type="submit">' . \i18n('Send') . '</button>\n';
+	return "<button class=\"btn btn-primary btn-send\" type=\"submit\">" . \i18n("Send") . "</button>\n";
 }
 
 function form_save() {

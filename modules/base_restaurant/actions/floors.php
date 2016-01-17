@@ -88,43 +88,28 @@ if (isset($_POST['floorData'])) {
 
 $floors = \Pasteque\PlacesService::getAllFloors();
 //Title
-\Pasteque\row(\Pasteque\mainTitle(\i18n("Floors configuration", PLUGIN_NAME)));
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Floors configuration", PLUGIN_NAME)));
 //Informations
 \Pasteque\tpl_msg_box($message, $error);
 ?>
 <form class="edit" method="post" onsubmit="javascript:save()" action="<?php echo \Pasteque\get_current_url();?>">
 <?
 	$legend = \i18n("Floor", PLUGIN_NAME);
-	$content = "
-	<div class=\"row\">
-	<label for=\"listFloors\">" . \i18n("Floors", PLUGIN_NAME) . "</label>
-	<select id=\"listFloors\" onchange=\"showFloor()\"></select>
-	</div>
-	<div class=\"row\">
-	<label for=\"floorLabel\">" . \i18n('Floor.label') . "</label>
-	<input type=\"text\" id=\"floorLabel\" onchange=\"javascript:updateFloor();\">
-	</div>
-	<div class=\"row actions\">";
+	$content = \Pasteque\row("<label for=\"listFloors\">" . \i18n("Floors", PLUGIN_NAME) . "</label>\n<select id=\"listFloors\" onchange=\"showFloor()\"></select>");
+	$content .= \Pasteque\row("<label for=\"floorLabel\">" . \i18n('Floor.label') . "</label>\n<input type=\"text\" id=\"floorLabel\" onchange=\"javascript:updateFloor();\">");
 	$buttonGroup = \Pasteque\jsAddButton(\i18n("Add a floor", PLUGIN_NAME), "newFloor()");
 	$buttonGroup .= \Pasteque\jsDeleteButton(\i18n("Delete floor", PLUGIN_NAME),"deleteCurrentFloor()");
-	$content .= \Pasteque\buttonGroup($buttonGroup);
-	$content .= "</div>";
+	$content .= \Pasteque\row(\Pasteque\buttonGroup($buttonGroup));
 	echo \Pasteque\form_fieldset($legend,$content);
 
 	$legend = \i18n("Place", PLUGIN_NAME);
-	$content = "
-	<div class=\"row\">
-	<label for=\"placeLabel\">" . \i18n('Place.label') . "</label>
-	<input type=\"text\" id=\"placeLabel\" onchange=\"javascript:updatePlaceLabel();\" onkeyup=\"javascript:updatePlaceLabel();\">
-	</div>
-	<div class=\"row actions\">";
+	$content = \Pasteque\row("<label for=\"placeLabel\">" . \i18n('Place.label') . "</label>\n<input type=\"text\" id=\"placeLabel\" onchange=\"javascript:updatePlaceLabel();\" onkeyup=\"javascript:updatePlaceLabel();\">");
 	$buttonGroup = \Pasteque\jsAddButton(\i18n("Add place", PLUGIN_NAME), "newPlace()");
 	$buttonGroup .= \Pasteque\jsDeleteButton(\i18n("Delete place", PLUGIN_NAME), "deletePlace()");
-	$content .= \Pasteque\buttonGroup($buttonGroup);
-	$content .= "</div>";
+	$content .= \Pasteque\row(\Pasteque\buttonGroup($buttonGroup));
 	echo \Pasteque\form_fieldset($legend,$content);
+	echo \Pasteque\row(\Pasteque\vanillaDiv("","floorDivContainer"));
 ?>
-	<div id="floorDivContainer" class="row"></div>
 	<div class="row actions">
 		<input id="floorData" name="floorData" type="hidden">
 		<?php echo \Pasteque\form_save();?>

@@ -121,12 +121,13 @@ function displayModule($module, $activatedModules, $pp_id, $sandbox) {
 }
 
 //Title
-\Pasteque\row(\Pasteque\mainTitle(\i18n("Modules", PLUGIN_NAME)));
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Modules", PLUGIN_NAME)));
 //Information
 \Pasteque\tpl_msg_box($message, $error);
 
 //Free modules section
-\Pasteque\row(\Pasteque\secondaryTitle(\i18n("Free modules", PLUGIN_NAME)));
+echo \Pasteque\row(\Pasteque\secondaryTitle(\i18n("Free modules", PLUGIN_NAME)));
+echo \Pasteque\row(\Pasteque\infoDiv(\i18n("Once modules are selected, they will be activated in a short moment.", PLUGIN_NAME)));
 ?>
 <form class="edit" action="<?php echo \Pasteque\get_current_url(); ?>" method="post">
 <?php foreach ($mandatoryModules as $module) { ?>
@@ -136,41 +137,43 @@ foreach($freeModules as $module) {
 	displayFreeModule($module, $activatedModules);
 }
 echo \Pasteque\row(\Pasteque\form_save());
-echo \Pasteque\row(\Pasteque\infoDiv(\i18n("Once modules are selected, they will be activated in a short moment.", PLUGIN_NAME))); ?>
+?>
 </form>
 
 <?php
-echo \Pasteque\row(\Pasteque\secondaryTitle(\i18n("Buy modules", PLUGIN_NAME)));
-?>
-<div class="edit">
-	<table cellpadding="0" cellspacing="0">
-		<tbody id="list">
-<?php
-$pp_id = null;
-if ($cfg['pp_sandbox']) {
-$pp_id = $cfg['pp_sandbox_id'];
-} else {
-$pp_id = $cfg['pp_user_id'];
+if(sizeof($modules) > 0) {
+	echo \Pasteque\row(\Pasteque\secondaryTitle(\i18n("Buy modules", PLUGIN_NAME)));
+	echo \Pasteque\row(\Pasteque\alertDiv(\i18n("Once payment is validated, the modules will be activated in a short moment.", PLUGIN_NAME)));
+	?>
+	<div class="edit">
+		<table cellpadding="0" cellspacing="0">
+			<tbody id="list">
+	<?php
+	$pp_id = null;
+	if ($cfg['pp_sandbox']) {
+		$pp_id = $cfg['pp_sandbox_id'];
+	}
+	else {
+		$pp_id = $cfg['pp_user_id'];
+	}
+
+	foreach ($modules as $module) {
+		echo "\t\t\t<tr>\n";
+		displayModule($module, $activatedModules, $pp_id, $cfg['pp_sandbox']);
+		echo "\t\t\t</tr>\n";
+	?>
+	<?php } ?>
+			</tbody>
+		</table>
+
+	<form target="paypal" action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" >
+		<input type="hidden" name="cmd" value="_cart" />
+		<input type="hidden" name="business" value="<?php echo \Pasteque\esc_attr($pp_id); ?>" />
+		<input type="hidden" name="display" value="1" />
+		<input type="image" src="https://www.sandbox.paypal.com/fr_FR/FR/i/btn/btn_viewcart_LG.gif" border="0" name="submit" alt="PayPal - la solution de paiement en ligne la plus simple et la plus sécurisée !" />
+		<img alt="" border="0" src="https://www.sandbox.paypal.com/fr_FR/i/scr/pixel.gif" width="1" height="1" />
+	</form>
+
+	<?php
 }
-
-foreach ($modules as $module) {
-	echo "\t\t\t<tr>\n";
-	displayModule($module, $activatedModules, $pp_id, $cfg['pp_sandbox']);
-	echo "\t\t\t</tr>\n";
-?>
-<?php } ?>
-		</tbody>
-	</table>
-
-<form target="paypal" action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" >
-<input type="hidden" name="cmd" value="_cart" />
-<input type="hidden" name="business" value="<?php echo \Pasteque\esc_attr($pp_id); ?>" />
-<input type="hidden" name="display" value="1" />
-<input type="image" src="https://www.sandbox.paypal.com/fr_FR/FR/i/btn/btn_viewcart_LG.gif" border="0" name="submit" alt="PayPal - la solution de paiement en ligne la plus simple et la plus sécurisée !" />
-<img alt="" border="0" src="https://www.sandbox.paypal.com/fr_FR/i/scr/pixel.gif" width="1" height="1" />
-</div>
-</form>
-
-<?php
-\Pasteque\row(\Pasteque\alertDiv(\i18n("Once payment is validated, the modules will be activated in a short moment.", PLUGIN_NAME)));
 ?>

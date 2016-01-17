@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Currencies module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -25,54 +26,42 @@ namespace BaseCurrencies;
 $message = NULL;
 $error = NULL;
 $currSrv = new \Pasteque\CurrenciesService();
-if (isset($_POST['delete-currency'])) {
-    if ($currSrv->delete($_POST['delete-currency'])) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-    }
+if (isset($_GET['delete-currency'])) {
+	if ($currSrv->delete($_GET['delete-currency'])) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+	}
 }
 
 $currencies = $currSrv->getAll();
-?>
-<h1><?php \pi18n("Currencies", PLUGIN_NAME); ?></h1>
 
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Currencies", PLUGIN_NAME)));
+//Button
+$buttons = \Pasteque\addButton(\i18n("Add a currency", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "currency_edit"));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
 
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "currency_edit"),
-        \i18n('Add a currency', PLUGIN_NAME), 'img/btn_add.png');?>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("Currency.label"); ?></th>
-			<th><?php \pi18n("Currency.rate"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php
-foreach ($currencies as $currency) {
-?>
-	<tr>
-		<td><?php echo $currency->label; ?></td>
-		<td><?php
-if ($currency->isMain) {
-    \pi18n("Main", PLUGIN_NAME);
-} else {
-    echo($currency->rate);
-} ?></td>
-		<td class="edition">
-            <?php \Pasteque\tpl_btn("edition", \Pasteque\get_module_url_action(PLUGIN_NAME,
-                    'currency_edit', array("id" => $currency->id)), "",
-                    'img/edit.png', \i18n('Edit'), \i18n('Edit'));
-            ?>
-			<form action="<?php echo \Pasteque\get_current_url(); ?>" method="post"><?php \Pasteque\form_delete("currency", $currency->id, \Pasteque\get_template_url() . 'img/delete.png') ?></form>
-		</td>
-	</tr>
-<?php
+if(count($currencies) == 0) {
+	echo \Pasteque\errorDiv(\i18n("No currency found", PLUGIN_NAME));
+}
+else {
+	$content[0][0] = \i18n("Currency.label");
+	$content[0][1] = \i18n("Currency.rate");
+	$i = 1;
+	foreach ($currencies as $currency) {
+		$content[$i][0] = $currency->label;
+		if ($currency->isMain) {
+			$content[$i][1] = \i18n("Main", PLUGIN_NAME);
+		} else {
+			$content[$i][1] = $currency->rate;
+		}
+		$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'currency_edit', array("id" => $currency->id)));
+		$btn_group .= \Pasteque\deleteButton(\i18n('Delete', PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-currency=" . $tax->id);
+		$content[$i][1] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
 }
 ?>
-	</tbody>
-</table>
-

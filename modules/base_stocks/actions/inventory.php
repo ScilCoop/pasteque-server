@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Stocks module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -24,7 +25,7 @@ $modules = \Pasteque\get_loaded_modules(\Pasteque\get_user_id());
 $multilocations = false;
 $defaultLocationId = null;
 if (in_array("stock_multilocations", $modules)) {
-    $multilocations = true;
+	$multilocations = true;
 }
 
 $locSrv = new \Pasteque\LocationsService();
@@ -32,124 +33,110 @@ $locations = $locSrv->getAll();
 $locNames = array();
 $locIds = array();
 foreach ($locations as $location) {
-    $locNames[] = $location->label;
-    $locIds[] = $location->id;
+	$locNames[] = $location->label;
+	$locIds[] = $location->id;
 }
 $currLocation = null;
 if (isset($_POST['location'])) {
-    $currLocation = $_POST['location'];
+	$currLocation = $_POST['location'];
 } else {
-    $currLocation = $locations[0]->id;
+	$currLocation = $locations[0]->id;
 }
-$products = \Pasteque\ProductsService::getAll(true);
+$products = \Pasteque\ProductsService::getAll();
 $categories = \Pasteque\CategoriesService::getAll();
 $prdCat = array();
 // Link products to categories and don't track compositions
 foreach ($products as $product) {
-    if ($product->categoryId !== \Pasteque\CompositionsService::CAT_ID) {
-        $prdCat[$product->categoryId][] = $product;
-    }
+	if ($product->categoryId !== \Pasteque\CompositionsService::CAT_ID) {
+		$prdCat[$product->categoryId][] = $product;
+	}
 }
 $levels = \Pasteque\StocksService::getLevels($currLocation);
 $prdLevel = array();
 foreach ($levels as $level) {
-    $prdLevel[$level->productId] = $level;
+	$prdLevel[$level->productId] = $level;
 }
-?>
-<h1><?php \pi18n("Inventory", PLUGIN_NAME); ?></h1>
 
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Inventory", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\exportButton(\i18n("Export inventory", PLUGIN_NAME), \Pasteque\get_report_url(PLUGIN_NAME, "inventory"));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
 
-<?php \Pasteque\tpl_btn('btn-export ', \Pasteque\get_report_url(PLUGIN_NAME, "inventory"),\i18n('Export inventory', PLUGIN_NAME), 'img/btn_add.png'); ?>
-
-<?php if ($multilocations) {
-    // Location picker ?>
-<form class="edit" action="<?php echo \Pasteque\get_current_url(); ?>" method="post">
-	<div class="row">
-		<?php \Pasteque\form_select("location", \i18n("Location"), $locIds, $locNames, $currLocation); ?>
-	</div>
-	<div class="row actions">
-		<?php \Pasteque\form_send(); ?>
-	</div>
-</form>
-<?php
+if ($multilocations) {
+	// Location picker
+	$content = \Pasteque\row(\Pasteque\form_select("location", \i18n("Location"), $locIds, $locNames, $currLocation));
+	$content .= \Pasteque\row(\Pasteque\form_send());
+	echo \Pasteque\row(\Pasteque\form_generate(\Pasteque\get_current_url(), "post", $content));
 }
 
 foreach ($categories as $category) {
-    if (isset($prdCat[$category->id])) {
-        // Category header ?>
-<h3><?php echo \Pasteque\esc_html($category->label); ?></h3>
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th></th>
-			<th><?php \pi18n("Product.reference"); ?></th>
-			<th><?php \pi18n("Product.label"); ?></th>
-			<th><?php \pi18n("Quantity"); ?></th>
-			<th><?php \pi18n("Stock.SellValue"); ?></th>
-			<th><?php \pi18n("Stock.BuyValue"); ?></th>
-			<th><?php \pi18n("QuantityMin"); ?></th>
-			<th><?php \pi18n("QuantityMax"); ?></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php
-        foreach ($prdCat[$category->id] as $product) {
-            if (!isset($prdLevel[$product->id])) {
-                continue;
-            }
-            // Level lines
-            $prdRef = "";
-            $prdLabel = "";
-            $imgSrc = "";
-            $prdSellPrice = 0;
-            $prdBuyPrice = 0;
-            $level = $prdLevel[$product->id];
-            if ($product->hasImage) {
-                $imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product&id=" . $product->id;
-            } else {
-                $imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product";
-            }
-            $prdLabel = $product->label;
-            $prdRef = $product->reference;
-            $prdSellPrice = $product->priceSell;
-            $prdBuyPrice = $product->priceBuy;
-            $security = $level->security;
-            $max = $level->max;
-            $qty = $level->qty !== null ? $level->qty : 0;
-            $class = "";
-            $help = "";
-            if ($security !== null && $qty < $security) {
-                $class=" warn-level";
-                $help = ' title="' . \Pasteque\esc_attr(\i18n("Stock is below security level!", PLUGIN_NAME)) . '"';
-            }
-            if ($qty < 0) {
-                $class=" alert-level";
-                $help = ' title="' . \Pasteque\esc_attr(\i18n("Stock is negative!", PLUGIN_NAME)) . '"';
-            } else if ($max !== NULL && $qty > $max) {
-                $class=" alert-level";
-                $help = ' title="' . \Pasteque\esc_attr(\i18n("Overstock!", PLUGIN_NAME)) . '"';
-            }
-            if (!isset($security)) {
-                $security = \i18n("Undefined");
-            }
-            if (!isset($max)) {
-                $max = \i18n("Undefined");
-            }
-            ?>
-		<tr>
-                 <td><img class="thumbnail" src="?<?php echo \Pasteque\esc_attr($imgSrc); ?>" />
-                 <td><?php echo \Pasteque\esc_html($prdRef); ?></td>
-                 <td><?php echo \Pasteque\esc_html($prdLabel); ?></td>
-                 <td class="numeric<?php echo $class; ?>"<?php echo $help; ?>><?php echo \Pasteque\esc_html($qty); ?></td>
-                 <td><?php echo \Pasteque\esc_html(\i18nCurr($prdSellPrice*$qty)); ?></td>
-                 <td><?php echo \Pasteque\esc_html(\i18nCurr($prdBuyPrice*$qty)); ?></td>
-                 <td><?php echo \Pasteque\esc_html($security); ?></td>
-                 <td><?php echo \Pasteque\esc_html($max); ?></td>
-		</tr>
-<?php
-        } ?>
-	</tbody>
-</table>
-<?php    }
+	if (isset($prdCat[$category->id])) {
+		// Category header
+		echo \Pasteque\row(\Pasteque\secondaryTitle($category->label));
+		$content[0][0] = "";
+		$content[0][1] = \i18n("Product.reference");
+		$content[0][2] = \i18n("Product.label");
+		$content[0][3] = \i18n("Quantity");
+		$content[0][4] = \i18n("Stock.SellValue");
+		$content[0][5] = \i18n("Stock.BuyValue");
+		$content[0][6] = \i18n("QuantityMin");
+		$content[0][7] = \i18n("QuantityMax");
+		$i = 1;
+		foreach ($prdCat[$category->id] as $product) {
+			if (!isset($prdLevel[$product->id])) {
+				continue;
+			}
+			// Level lines
+			$prdRef = "";
+			$prdLabel = "";
+			$imgSrc = "";
+			$prdSellPrice = 0;
+			$prdBuyPrice = 0;
+			$level = $prdLevel[$product->id];
+			if ($product->hasImage) {
+				$imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product&id=" . $product->id;
+			} else {
+				$imgSrc = \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product";
+			}
+			$prdLabel = $product->label;
+			$prdRef = $product->reference;
+			$prdSellPrice = $product->priceSell !== null ? $product->priceSell : 0;
+			$prdBuyPrice = $product->priceBuy !== null ? $product->priceBuy : 0;
+			$security = $level->security;
+			$max = $level->max;
+			$qty = $level->qty !== null ? $level->qty : 0;
+			$class = "";
+			$help = "";
+			if ($security !== null && $qty < $security) {
+				$class=" warn-level";
+				$help = ' title="' . \Pasteque\esc_attr(\i18n("Stock is below security level!", PLUGIN_NAME)) . '"';
+			}
+			if ($qty < 0) {
+				$class=" alert-level";
+				$help = ' title="' . \Pasteque\esc_attr(\i18n("Stock is negative!", PLUGIN_NAME)) . '"';
+			} else if ($max !== NULL && $qty > $max) {
+				$class=" alert-level";
+				$help = ' title="' . \Pasteque\esc_attr(\i18n("Overstock!", PLUGIN_NAME)) . '"';
+			}
+			if (!isset($security)) {
+				$security = \i18n("Undefined");
+			}
+			if (!isset($max)) {
+				$max = \i18n("Undefined");
+			}
+			$content[$i][0] = "<img class=\"thumbnail\" src=\"?" . \Pasteque\esc_attr($imgSrc) . "\">";
+			$content[$i][1] = \Pasteque\esc_html($prdRef);
+			$content[$i][2] = \Pasteque\esc_html($prdLabel);
+			$content[$i][3] = \Pasteque\esc_html($qty);
+			$content[$i][4] = \Pasteque\esc_html(\i18nCurr($prdSellPrice*$qty));
+			$content[$i][5] = \Pasteque\esc_html(\i18nCurr($prdBuyPrice*$qty));
+			$content[$i][6] = \Pasteque\esc_html($security);
+			$content[$i][7] = \Pasteque\esc_html($max);
+			$i++;
+		}
+		echo \Pasteque\row(\Pasteque\standardTable($content));
+	}
 }

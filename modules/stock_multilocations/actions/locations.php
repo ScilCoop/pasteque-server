@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Users module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -25,37 +26,37 @@ $error = null;
 $srv = new \Pasteque\LocationsService();
 
 if (isset($_POST['delete-location'])) {
-    if ($srv->delete($_POST['delete-location'])) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to delete location. A location cannot be deleted when stock is assigned to it.", PLUGIN_NAME);
-    }
+	if ($srv->delete($_POST['delete-location'])) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to delete location. A location cannot be deleted when stock is assigned to it.", PLUGIN_NAME);
+	}
 }
 
 $locations = $srv->getAll();
+
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Locations", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\addButton(\i18n("New location", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'location_edit'));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Informations
+\Pasteque\tpl_msg_box($message, $error);
+//Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d locations", PLUGIN_NAME, count($locations))));
+
+if (count($locations) == 0) {
+	echo \Pasteque\errorDiv(\i18n("No location found", PLUGIN_NAME));
+}
+else {
+	$content[0][0] = \i18n("Location.label");
+	$i = 1;
+	foreach ($locations as $location) {
+		$content[$i][0] = $location->label;
+		$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'location_edit', array("id" => $location->id)));
+		$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
+	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
+}
 ?>
-<h1><?php \pi18n("Locations", PLUGIN_NAME); ?></h1>
-
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
-
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "location_edit"),
-        \i18n('New location', PLUGIN_NAME), 'img/btn_add.png');?>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("Location.label"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php foreach ($locations as $location) { ?>
-		<tr>
-			<td><?php echo $location->label; ?></td>
-			<td class="edition">
-				<a href="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'location_edit', array('id' => $location->id)); ?>"><img src="<?php echo \Pasteque\get_template_url(); ?>img/edit.png" alt="<?php \pi18n('Edit'); ?>" title="<?php \pi18n('Edit'); ?>"></a>
-			</td>
-		</tr>
-<?php } ?>
-	</tbody>
-</table>

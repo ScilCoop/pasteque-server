@@ -156,14 +156,14 @@ function __tpl_report_input($report, $values) {
 	echo "<div class=\"col-md-12 panel-group\" id=\"options\""
 		. " role=\"tablist\" aria-multiselectable=\"true\">\n";
 	// Export button
-	echo "\t<div><a class=\"btn btn-primary\" href=\""
-		. \Pasteque\get_report_url($report->getDomain(), $report->getId());
+	$params = "";
 	foreach($report->getParams() as $param) {
-		echo "&" . $param['param'] . "=" . $values[$param['param']];
+		$params .= "&" . $param['param'] . "=" . $values[$param['param']];
 	}
-	echo "\">" . \i18n("Export") . "</a></div>\n";
+	$action = \Pasteque\get_report_url($report->getDomain(), $report->getId() . $params);
+	echo \Pasteque\row(\Pasteque\exportButton(\i18n("Export"),$action));
 	// Collapsable options
-	echo "\t<div class=\"panel panel-default\">\n";
+	echo "\t<div class=\"row panel panel-default\">\n";
 	echo "\t\t<div class=\"panel-heading\" role=\"tab\" id=\"options-heading\">\n";
 	echo "\t\t\t<h4 class=\"panel-title\">"
 		. "<a role=\"button\" data-toggle=\"collapse\""
@@ -183,18 +183,13 @@ function __tpl_report_input($report, $values) {
 		$id = $param['param'];
 		switch ($param['type']) {
 			case DB::DATE:
-				if($param['label'] != null && $param['label'] != "" && $param['type'] != "hidden") {
-					echo "\t\t\t\t\t\t<label for=\"" . $id . "\">" . $param['label'] . "</label>\n";
-				}
 				$value = \i18nDate($values[$id]);
-				echo "\t\t\t\t\t\t<div data-date-format=\"yyyy-mm-dd\" class=\"input-group date col-md-6\" id=\"datepicker-" . $id . "\">\n";
-		echo "\t\t\t\t\t\t\t<input type=\"text\""
-				. " class=\"form-control\" name=\"" . $id . 
-				"\" id=\"" . $id ."\" value=\"" . $value ."\">\n";
-				echo "\t\t\t\t\t\t\t<div class=\"input-group-addon\">\n";
-				echo "\t\t\t\t\t\t\t\t<span class=\"glyphicon glyphicon-th\"></span>\n";
-				echo "\t\t\t\t\t\t\t</div>\n";
-				echo "\t\t\t\t\t\t</div>\n";
+				if($param['label'] != null && $param['label'] != "" && $param['type'] != "hidden") {
+					echo \Pasteque\row(\Pasteque\form_date($id, $value, $label));
+				}
+				else {
+					echo \Pasteque\row(\Pasteque\form_date($id, $value));
+				}
 				break;
 			case 'hidden':
 				$value = $values[$param['param']];
