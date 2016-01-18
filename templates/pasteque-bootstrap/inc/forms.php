@@ -2,7 +2,7 @@
 //    Pastèque Web back office
 //
 //    Copyright (C) 2013-2016 Scil (http://scil.coop)
-//        Philippe Pary philippe@scil.coop
+//        Cédric Houbart, Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -43,6 +43,32 @@ function form_hidden($form_id, $object, $field) {
 function form_value_hidden($form_id, $name, $value) {
 	return "<input type=\"hidden\" name=\"" . esc_attr($name)
 		. "\" value=\"" . esc_attr($value) . "\"/>\n";
+}
+
+function form_number($id, $value=null, $label=null, $step=null, $min=null, $max=null, $class=null) {
+	$ret = "";
+	if($label !== null) {
+		$ret = "<label for=\"" . $id . "\">" . $label . "</label>\n";
+	}
+	$ret .= "<input type=\"number\" class=\"form-control";
+	if($class !== null) {
+		$ret .= " " .$class;
+	}
+	$ret .= "\"";
+	if($value !== null) {
+		$ret .= " value=\"" . $value . "\"";
+	}
+	if($step !== null) {
+		$ret .= " step=\"" . $step . "\"";
+	}
+	if($min !== null) {
+		$ret .= " min=\"" . $min . "\"";
+	}
+	if($max !== null) {
+		$ret .= " max=\"" . $max . "\"";
+	}
+	$ret .= ">\n";
+	return $ret;
 }
 
 function form_date($id, $value, $label=null, $format=null, $class=null) {
@@ -279,9 +305,9 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 
 /** Create a select with given labels. For relation in a model use form_input
  * with type pick */
-function form_select($id, $label, $values, $labels, $currentValue) {
+function form_select($id, $label, $values, $labels, $currentValue=null) {
 	$ret =  "<label for=\"" . esc_attr($id) ."\">" . esc_html($label) . "</label>\n";
-	$ret .=  "<select id=\"" . esc_attr($id) . "\" name=\"" . esc_attr($id) . "\">\n";
+	$ret .=  "<select id=\"" . esc_attr($id) . "\" class=\"form-control\" name=\"" . esc_attr($id) . "\">\n";
 	for ($i = 0; $i < count($values); $i++) {
 		$selected = "";
 		if ($values[$i] === $currentValue) {

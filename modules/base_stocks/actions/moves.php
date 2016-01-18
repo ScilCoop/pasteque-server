@@ -2,7 +2,7 @@
 //    Pastèque Web back office, Stocks module
 //
 //    Copyright (C) 2013-2016 Scil (http://scil.coop)
-//        Philippe Pary philippe@scil.coop
+//        Cédric Houbart, Philippe Pary
 //
 //    This file is part of Pastèque.
 //
@@ -221,7 +221,7 @@ echo \Pasteque\row(\Pasteque\form_generate(\Pasteque\get_current_url(),"post",$c
 			html += "\t<td><img class=\"thumbnail\" src=\"" + src + "\"></td>\n";
 			html += "\t<td>" + product['reference'] + "</td>\n";
 			html += "\t<td>" + product['label'] + "</td>\n";
-			html += "\t<td class=\"qty-cell\"><input class=\"qty\" id=\"line-" + product['id'] + "-qty\" type=\"numeric\" name=\"qty-" + product['id'] + "\" value=\"1\"></td>\n";
+			html += "\t<td class=\"qty-cell\"><input class=\"qty\" id=\"line-" + product['id'] + "-qty\" type=\"number\" name=\"qty-" + product['id'] + "\" value=\"1\"></td>\n";
 			html += "\t<td><?php echo sprintf(\Pasteque\esc_js(\Pasteque\buttonGroup(\Pasteque\jsDeleteButton(\i18n("Delete"),"%s"))),"javascript:deleteLine('\" + product['id'] + \"');return false;"); ?></td>\n";
 			html += "</tr>\n";
 			jQuery("tbody").append(html);
@@ -238,7 +238,7 @@ echo \Pasteque\row(\Pasteque\form_generate(\Pasteque\get_current_url(),"post",$c
 		html += "<td><img class=\"thumbnail\" src=\"" + src + "\" /></td>\n";
 		html += "<td>" + productRef + "</td>\n";
 		html += "<td>" + productLabel + "</td>\n";
-		html += "<td class=\"qty-cell\"><input class=\"qty\" id=\"line-" + productId + "-qty\" type=\"numeric\" name=\"qty-" + productId + "\" value=\"" + qty + "\" />\n";
+		html += "<td class=\"qty-cell\"><input class=\"qty\" id=\"line-" + productId + "-qty\" type=\"number\" name=\"qty-" + productId + "\" value=\"" + qty + "\" />\n";
 		html += "<td><a class=\"btn-delete\" href=\"\" onClick=\"javascript:deleteLine('" + productId + "');return false;\"><?php \pi18n("Delete"); ?></a></td>\n";
 		html += "</tr>\n";
 		jQuery("tobody").append(html);

@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Products module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Cédric Houbart, Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -18,48 +19,46 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Pastèque.  If not, see <http://www.gnu.org/licenses/>.
 
-// tax_edit action
-
 namespace ProductAttributes;
 
 $message = null;
 $error = null;
 // Check saves
 if (isset($_POST['id'])) {
-    // Update attribute
-    $attr = \Pasteque\Attribute::__build($_POST['id'], $_POST['label'], null);
-    \Pasteque\AttributesService::updateAttribute($attr);
-    // edit values
-    $taxValues = array();
-    foreach ($_POST as $key => $value) {
-        if (strpos($key, "label-") === 0 && $key != "label-new") {
-            $id = substr($key, 6);
-            $val = \Pasteque\AttributeValue::__build($id, $value);
-            \Pasteque\AttributesService::updateValue($val);
-        }
-    }
-    if (isset($_POST['delete'])) {
-        foreach ($_POST['delete'] as $del) {
-            \Pasteque\AttributesService::deleteValue($del);
-        }
-    }
-    // new values?
-    foreach ($_POST['label-new'] as $newVal) {
-        if ($newVal !== null && $newVal !== "") {
-            $newValObj = new \Pasteque\AttributeValue($newVal);
-            \Pasteque\AttributesService::createValue($newValObj, $_POST['id']);
-        }
-    }
+	// Update attribute
+	$attr = \Pasteque\Attribute::__build($_POST['id'], $_POST['label'], null);
+	\Pasteque\AttributesService::updateAttribute($attr);
+	// edit values
+	$taxValues = array();
+	foreach ($_POST as $key => $value) {
+		if (strpos($key, "label-") === 0 && $key != "label-new") {
+			$id = substr($key, 6);
+			$val = \Pasteque\AttributeValue::__build($id, $value);
+			\Pasteque\AttributesService::updateValue($val);
+		}
+	}
+	if (isset($_POST['delete'])) {
+		foreach ($_POST['delete'] as $del) {
+			\Pasteque\AttributesService::deleteValue($del);
+		}
+	}
+	// new values?
+	foreach ($_POST['label-new'] as $newVal) {
+		if ($newVal !== null && $newVal !== "") {
+			$newValObj = new \Pasteque\AttributeValue($newVal);
+			\Pasteque\AttributesService::createValue($newValObj, $_POST['id']);
+		}
+	}
 } else if (isset($_POST['label'])) {
-    // Create attribute
-    $attr = new \Pasteque\Attribute($_POST['label'], null);
-    \Pasteque\AttributesService::createAttribute($attr);
-    foreach ($_POST['label-new'] as $newVal) {
-        if ($newVal !== null && $newVal !== "") {
-            $newValObj = new \Pasteque\AttributeValue($newVal);
-            \Pasteque\AttributesService::createValue($newValObj, $attr->id);
-        }
-    }
+	// Create attribute
+	$attr = new \Pasteque\Attribute($_POST['label'], null);
+	\Pasteque\AttributesService::createAttribute($attr);
+	foreach ($_POST['label-new'] as $newVal) {
+		if ($newVal !== null && $newVal !== "") {
+			$newValObj = new \Pasteque\AttributeValue($newVal);
+			\Pasteque\AttributesService::createValue($newValObj, $attr->id);
+		}
+	}
 }
 
 $attribute = null;

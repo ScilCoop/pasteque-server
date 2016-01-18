@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Products module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Cédric Houbart, Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -23,53 +24,38 @@ namespace ProductAttributes;
 $message = null;
 $error = null;
 
-if (isset($_POST['delete-set'])) {
-    if (\Pasteque\AttributesService::deleteSet($_POST['delete-set'])) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-    }
+if (isset($_GET['delete-set'])) {
+	if (\Pasteque\AttributesService::deleteSet($_GET['delete-set'])) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+	}
 }
 
 $sets = \Pasteque\AttributesService::getAll();
-?>
-<h1><?php \pi18n("Attribute sets", PLUGIN_NAME); ?></h1>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Attribute sets", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\addButton(\i18n("Add an attribute set", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "set_edit"));
+echo \Pasteque\buttonGroup($buttons);
+//Information
+\Pasteque\tpl_msg_box($message, $error);
+//Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d sets", PLUGIN_NAME, count($sets))));
 
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
-
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "set_edit"),
-        \i18n('Add an attribute set', PLUGIN_NAME), 'img/btn_add.png');?>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("AttributeSet.label"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php
-foreach ($sets as $set) {
-?>
-	<tr>
-		<td><?php echo $set->label; ?></td>
-		<td class="edition">
-            <?php \Pasteque\tpl_btn("edition", \Pasteque\get_module_url_action(PLUGIN_NAME,
-                    'set_edit', array("id" => $set->id)), "",
-                    'img/edit.png', \i18n('Edit'), \i18n('Edit'));
-            ?>
-			<form action="<?php echo \Pasteque\get_current_url(); ?>" method="post"><?php \Pasteque\form_delete("set", $set->id, \Pasteque\get_template_url() . 'img/delete.png') ?></form>
-		</td>
-	</tr>
-<?php
-}
-?>
-	</tbody>
-</table>
-<?php
 if (count($sets) == 0) {
-?>
-<div class="alert"><?php \pi18n("No attribute set found", PLUGIN_NAME); ?></div>
-<?php
+	echo \Pasteque\row(\Pasteque\errorDiv(\i18n("No attribute set found", PLUGIN_NAME)));
+}
+else {
+	$content[0][0] = \i18n("AttributeSet.label");
+	$i = 1;
+	foreach ($sets as $set) {
+		$content[$i][0] = $set->label;
+		$btn_group = \Pasteque\editButton(\i18n("Edit", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "set_edit", array("id" => $set->id)));
+		$btn_group .= \Pasteque\deleteButton(\i18n("Delete", PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-set=" . $set->id);
+		$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
+	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
 }
 ?>

@@ -1,8 +1,8 @@
 <?php
 //    Pastèque Web back office, Products module
 //
-//    Copyright (C) 2015 Scil (http://scil.coop)
-//    Philippe Pary
+//    Copyright (C) 2015-2016 Scil (http://scil.coop)
+//        Philippe Pary
 //
 //    This file is part of Pastèque.
 //
@@ -26,65 +26,46 @@ namespace TicketProducts;
 $message = NULL;
 $error = NULL;
 
-if (isset($_POST['delete-dis'])) {
-    if (\Pasteque\DiscountsService::deleteDis($_POST['delete-dis'])) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-    }
+if (isset($_GET['delete-discount'])) {
+	if (\Pasteque\DiscountsService::deleteDis($_GET['delete-discount'])) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+	}
 }
 
 $discounts = \Pasteque\DiscountsService::getAll();
-?>
 
-<h1><?php \pi18n("Discounts", PLUGIN_NAME); ?></h1>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Discounts", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\addButton(\i18n("Add a discount campain", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "discount_edit"));
+$buttons .= \Pasteque\importButton(\i18n("Import discounts", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "discountsManagement"));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
+//Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d discounts", PLUGIN_NAME, count($discounts))));
 
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
-
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "discount_edit"),
-        \i18n('Add a discount campain', PLUGIN_NAME), 'img/btn_add.png');?>
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "discountsManagement"),
-        \i18n('Import discounts', PLUGIN_NAME), 'img/btn_add.png');?>
-
-<p><?php \i18n("%d discounts", PLUGIN_NAME, count($discounts)); ?></p>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("Discount.label"); ?></th>
-                        <th><?php \pi18n("Discount.startDate"); ?></th>
-                        <th><?php \pi18n("Discount.endDate"); ?></th>
-                        <th><?php \pi18n("Discount.rate"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php
-
-function printDiscount($printDiscount) {
-    ?><tr class="row">
-            <td><? echo $printDiscount->label; ?></td>
-            <td><? echo $printDiscount->startDate; ?></td>
-            <td><? echo $printDiscount->endDate; ?></td>
-            <td><? echo $printDiscount->rate; ?></td>
-            <td class="edition">
-                    <?php \Pasteque\tpl_btn("edition", \Pasteque\get_module_url_action(PLUGIN_NAME,
-                            'discount_edit', array("id" => $printDiscount->id)), "",
-                            'img/edit.png', \i18n('Edit'), \i18n('Edit'));
-                    ?>
-            <form action="<?php echo \Pasteque\get_current_url(); ?>" method="post"><?php \Pasteque\form_delete("dis", $printDiscount->id, \Pasteque\get_template_url() . 'img/delete.png') ?></form></td>
-</tr><?
+if(count($discounts) == 0) {
+	echo \Pasteque\errorDiv(\i18n("No discount campain found", PLUGIN_NAME));
 }
-foreach($discounts as $discount) {
-     printDiscount($discount);
-}
-?>
-    </tbody>
-</table>
-<?php
-if (count($discounts) == 0) {
-?>
-<div class="alert"><?php \pi18n("No discount campain found", PLUGIN_NAME); ?></div>
-<?php
+else {
+	$content[0][0] = \i18n("label", PLUGIN_NAME);
+	$content[0][1] = \i18n("startDate", PLUGIN_NAME);
+	$content[0][2] = \i18n("endDate", PLUGIN_NAME);
+	$content[0][3] = \i18n("rate", PLUGIN_NAME);
+	$i = 1;
+	foreach($discounts as $discount) {
+		$content[$i][0] = $discount->label;
+		$content[$i][1] = $discount->startDate;
+		$content[$i][2] = $discount->endDate;
+		$content[$i][3] = $discount->rate;
+		$btn_group = \Pasteque\editButton(\i18n("Edit", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "discount_edit", array("id" => $discount->id)));
+		$btn_group .= \Pasteque\deleteButton(\i18n("Delete", PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-discount=" . $discount->id);
+		$content[$i][3] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
+	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
 }
 ?>

@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Product barcodes module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2015-2016 Scil (http://scil.coop)
+//        Cédric Houbart, Philippe Pary
 //
 //    This file is part of Pastèque.
 //
@@ -27,89 +28,67 @@ $categories = \Pasteque\CategoriesService::getAll();
 $allProducts = \Pasteque\ProductsService::getAll();
 $products = array();
 foreach ($allProducts as $product) {
-    if ($product->barcode !== NULL && $product->barcode != "") {
-        $products[] = $product;
-    }
+	if ($product->barcode !== NULL && $product->barcode != "") {
+		$products[] = $product;
+	}
 }
 
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Tags", PLUGIN_NAME)));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
+
+$content = \Pasteque\row(\Pasteque\form_number("start_from", "1", \i18n("Start from", PLUGIN_NAME), "1", "1", null, null));
+
+$dir = opendir("modules/product_barcodes/print/templates/");
+while($f = readdir($dir)) {
+	if($f != "." && $f != ".." && $f != "index.php") {
+		$values[] = substr($f,0,strpos($f,".php"));
+	}
+}
+$content .= \Pasteque\row(\Pasteque\form_select("format", \i18n("Format", PLUGIN_NAME), $values, $values));
+
+$content .= \Pasteque\row(\Pasteque\vanillaDiv("","catalog-picker"));
+$table[0][0] = "";
+$table[0][1] = \i18n("Product.reference");
+$table[0][2] = \i18n("Product.label");
+$table[0][3] = \i18n("Quantity");
+$table[0][4] = "";
+$content .= \Pasteque\row(\Pasteque\standardTable($table));
+
+$content .= \Pasteque\row(\Pasteque\form_send());
+
+echo \Pasteque\row(\Pasteque\form_generate("?" . \Pasteque\PT::URL_ACTION_PARAM . "=print&w=pdf&m=" . PLUGIN_NAME . "&n=tags","post",$content));
+\Pasteque\init_catalog("catalog", "catalog-picker", "addProduct",
+        $categories, $products);
 ?>
-<h1><?php \pi18n("Tags", PLUGIN_NAME); ?></h1>
-
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
-
-<form class="edit" action="?<?php echo \Pasteque\PT::URL_ACTION_PARAM; ?>=print&w=pdf&m=<?php echo PLUGIN_NAME; ?>&n=tags" method="post">
-    <div class="row">
-        <label for="start_from"><?php \pi18n("Start from", PLUGIN_NAME); ?></label>
-        <input type="numeric" name="start_from" id="start_from" value="1" />
-    </div>
-    <div class="row">
-        <label for="format"><?php \pi18n("Format", PLUGIN_NAME); ?></label>
-        <select name="format" id="format">
-        <?php
-            $dir = opendir("modules/product_barcodes/print/templates/");
-            echo getcwd();
-            while($f = readdir($dir)) {
-                if($f != "." && $f != ".." && $f != "index.php") {
-                    $name = substr($f,0,strpos($f,".php"));
-                    echo "\t\t\t<option value=\"" . $name . "\">" . $name ."</option>\n";
-                }
-            }
-        ?>
-        </select>
-    </div>
-
-    <div id="catalog-picker"></div>
-
-    <table cellpadding="0" cellspacing="0">
-        <thead>
-            <tr>
-                <th></th>
-                <th><?php \pi18n("Product.reference"); ?></th>
-                <th><?php \pi18n("Product.label"); ?></th>
-                <th><?php \pi18n("Quantity"); ?></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody id="list">
-        </tbody>
-    </table>
-
-        <div class="row actions">
-            <?php \Pasteque\form_send(); ?>
-        </div>
-
-</form>
-
-<?php \Pasteque\init_catalog("catalog", "catalog-picker", "addProduct",
-        $categories, $products); ?>
-
 <script type="text/javascript">
-        addProduct = function(productId) {
-            var product = catalog.products[productId];
-            if (jQuery("#line-" + productId).length > 0) {
-                // Add quantity to existing line
-                var qty = jQuery("#line-" + productId + "-qty");
-                var currVal = qty.val();
-                qty.val(parseInt(currVal) + 1);
-            } else {
-                // Add line
-                var src;
-                if (product['hasImage']) {
-                    src = "?p=img&w=product&id=" + product['id'];
-                } else {
-                    src = "?p=img&w=product";
-                }
-                var html = "<tr id=\"line-" + product['id'] + "\">\n";
-                html += "<td><img class=\"thumbnail\" src=\"" + src + "\" /></td>\n";
-                html += "<td>" + product['reference'] + "</td>\n";
-                html += "<td>" + product['label'] + "</td>\n";
-                html += "<td class=\"qty-cell\"><input class=\"qty\" id=\"line-" + product['id'] + "-qty\" type=\"numeric\" name=\"qty-" + product['id'] + "\" value=\"1\" />\n";
-                html += "<td><a class=\"btn-delete\" href=\"\" onClick=\"javascript:deleteLine('" + product['id'] + "');return false;\"><?php \pi18n("Delete"); ?></a></td>\n";
-                html += "</tr>\n"; 
-                jQuery("#list").append(html);
-            }
-        }
-    deleteLine = function(productId) {
-    jQuery("#line-" + productId).detach();
-}
+	addProduct = function(productId) {
+		var product = catalog.products[productId];
+		if (jQuery("#line-" + productId).length > 0) {
+			// Add quantity to existing line
+			var qty = jQuery("#line-" + productId + "-qty");
+			var currVal = qty.val();
+			qty.val(parseInt(currVal) + 1);
+		} else {
+			// Add line
+			var src;
+			if (product['hasImage']) {
+				src = "?p=img&w=product&id=" + product['id'];
+			} else {
+				src = "?p=img&w=product";
+			}
+			var html = "<tr id=\"line-" + product['id'] + "\">\n";
+			html += "<td><img class=\"thumbnail\" src=\"" + src + "\" /></td>\n";
+			html += "<td>" + product['reference'] + "</td>\n";
+			html += "<td>" + product['label'] + "</td>\n";
+			html += "<td class=\"qty-cell\"><input class=\"qty\" id=\"line-" + product['id'] + "-qty\" type=\"number\" name=\"qty-" + product['id'] + "\" value=\"1\" />\n";
+			html += "\t<td><?php echo sprintf(\Pasteque\esc_js(\Pasteque\buttonGroup(\Pasteque\jsDeleteButton(\i18n("Delete"),"%s"))),"javascript:deleteLine('\" + product['id'] + \"');return false;"); ?></td>\n";
+			html += "</tr>\n";
+			jQuery("tbody").append(html);
+		}
+	}
+	deleteLine = function(productId) {
+		jQuery("#line-" + productId).detach();
+	}
 </script>

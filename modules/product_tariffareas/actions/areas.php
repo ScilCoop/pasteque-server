@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Products module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Cédric Houbart, Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -23,57 +24,38 @@ namespace ProductTariffAreas;
 $message = null;
 $error = null;
 $srv = new \Pasteque\TariffAreasService();
-if (isset($_POST['delete-area'])) {
-    if ($srv->delete($_POST['delete-area'])) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-    }
+if (isset($_GET['delete-area'])) {
+	if ($srv->delete($_GET['delete-area'])) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+	}
 }
 
 $areas = $srv->getAll();
-?>
-<h1><?php \pi18n("Tariff areas", PLUGIN_NAME); ?></h1>
 
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Tariff areas", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\addButton(\i18n("Add an area", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "area_edit"));
+$buttons .= \Pasteque\importButton(\i18n("Import areas", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "areas_import"));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
+//Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d tariff areas", PLUGIN_NAME, count($areas))));
 
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "area_edit"),
-        \i18n('Add an area', PLUGIN_NAME), 'img/btn_add.png');?>
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "areas_import"),
-        \i18n('Import areas', PLUGIN_NAME), 'img/btn_add.png');?>
-
-<p><?php \pi18n("%d tariff areas", PLUGIN_NAME, count($areas)); ?></p>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("TariffArea.label"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php
-foreach ($areas as $area) {
-?>
-	<tr>
-		<td><?php echo $area->label; ?></td>
-		<td class="edition">
-            <?php \Pasteque\tpl_btn("edition", \Pasteque\get_module_url_action(PLUGIN_NAME,
-                    'area_edit', array("id" => $area->id)), "",
-                    'img/edit.png', \i18n('Edit'), \i18n('Edit'));
-            ?>
-			<form action="<?php echo \Pasteque\get_current_url(); ?>" method="post"><?php \Pasteque\form_delete("area", $area->id, \Pasteque\get_template_url() . 'img/delete.png') ?></form>
-		</td>
-	</tr>
-<?php
-}
-?>
-	</tbody>
-</table>
-<?php
 if (count($areas) == 0) {
-?>
-<div class="alert"><?php \pi18n("No area found", PLUGIN_NAME); ?></div>
-<?php
+	echo \Pasteque\errorDiv(\i18n("No area found", PLUGIN_NAME));
+}
+else {
+	$content[0][0] = \i18n("TariffArea.label");
+	$i = 1;
+	foreach ($areas as $area) {
+		$content[$i][0] = $area->label;
+		$btn_group = \Pasteque\editButton(\i18n("Edit", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "area_edit", array("id" => $area->id)));
+		$btn_group .= \Pasteque\deleteButton(\i18n("Delete", PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-area=" . $area->id);
+		$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
 }
 ?>

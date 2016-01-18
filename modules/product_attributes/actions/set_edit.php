@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Products module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Cédric Houbart, Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -18,23 +19,21 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Pastèque.  If not, see <http://www.gnu.org/licenses/>.
 
-// tax_edit action
-
 namespace ProductAttributes;
 
 $message = null;
 $error = null;
 // Check saves
 if (isset($_POST['id'])) {
-    // Update attribute
-    $set = \Pasteque\AttributeSet::__build($_POST['id'], $_POST['label']);
-    foreach ($_POST['id-attr'] as $attrId) {
-        if ($attrId !== null && $attrId !== "") {
-            $attr = \Pasteque\Attribute::__build($attrId, "unused", null);
-            $set->addAttribute($attr, null);
-        }
-    }
-    \Pasteque\AttributesService::updateSet($set);
+	// Update attribute
+	$set = \Pasteque\AttributeSet::__build($_POST['id'], $_POST['label']);
+	foreach ($_POST['id-attr'] as $attrId) {
+		if ($attrId !== null && $attrId !== "") {
+			$attr = \Pasteque\Attribute::__build($attrId, "unused", null);
+			$set->addAttribute($attr, null);
+		}
+	}
+	\Pasteque\AttributesService::updateSet($set);
 } else if (isset($_POST['label'])) {
     // Create attribute
     $set = new \Pasteque\AttributeSet($_POST['label']);

@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Users module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -25,37 +26,38 @@ $error = null;
 $srv = new \Pasteque\DiscountProfilesService();
 
 if (isset($_POST['delete-profile'])) {
-    if ($srv->delete($_POST['delete-profile'])) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-    }
+	if ($srv->delete($_POST['delete-profile'])) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+	}
 }
 
 $profiles = $srv->getAll();
+
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Discount profiles", PLUGIN_NAME)));
+//Buttons
+$buttons = \Pasteque\addButton(\i18n("New discount profile", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "discountprofile_edit"));
+//Informations
+\Pasteque\tpl_msg_box($message,$error);
+//Counter
+echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d profiles", PLUGIN_NAME, count($profiles))));
+
+if (count($profiles) == 0) {
+	echo \Pasteque\errorDiv(\i18n("No profile found", PLUGIN_NAME));
+}
+else {
+	$content[0][0] = \i18n("DiscountProfile.label");
+	$content[0][1] = \i18n("DiscountProfile.rate");
+	$i = 1;
+	foreach ($profiles as $profile) {
+		$content[$i][0] = $profile->label;
+		$content[$i][1] = $profile->rate;
+		$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'discountprofile_edit', array("id" => $profile->id)));
+		$content[$i][1] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
+	}
+	echo \Pasteque\row(\Pasteque\standardTable($content));
+}
 ?>
-<h1><?php \pi18n("Discount profiles", PLUGIN_NAME); ?></h1>
-
-<?php \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "discountprofile_edit"),
-        \i18n('New discount profile', PLUGIN_NAME), 'img/btn_add.png');?>
-
-<table cellpadding="0" cellspacing="0">
-	<thead>
-		<tr>
-			<th><?php \pi18n("DiscountProfile.label"); ?></th>
-			<th><?php \pi18n("DiscountProfile.rate"); ?></th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-<?php foreach ($profiles as $profile) { ?>
-		<tr>
-			<td><?php echo $profile->label; ?></td>
-			<td><?php echo $profile->rate; ?></td>
-			<td class="edition">
-				<a href="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'discountprofile_edit', array('id' => $profile->id)); ?>"><img src="<?php echo \Pasteque\get_template_url(); ?>img/edit.png" alt="<?php \pi18n('Edit'); ?>" title="<?php \pi18n('Edit'); ?>"></a>
-			</td>
-		</tr>
-<?php } ?>
-	</tbody>
-</table>
