@@ -41,14 +41,14 @@ function form_hidden($form_id, $object, $field) {
 }
 
 function form_value_hidden($form_id, $name, $value) {
-	return "<input type=\"hidden\" name=\"" . esc_attr($name)
+	return "<input id=\"" . $form_id . "\" type=\"hidden\" name=\"" . esc_attr($name)
 		. "\" value=\"" . esc_attr($value) . "\"/>\n";
 }
 
 function form_number($id, $value=null, $label=null, $step=null, $min=null, $max=null, $class=null) {
 	$ret = "";
 	if($label !== null) {
-		$ret = "<label for=\"" . $id . "\">" . $label . "</label>\n";
+		$ret = "<label for=\"" . $id . "\" class=\"control-label\">" . $label . "</label>\n";
 	}
 	$ret .= "<input type=\"number\" class=\"form-control";
 	if($class !== null) {
@@ -74,7 +74,7 @@ function form_number($id, $value=null, $label=null, $step=null, $min=null, $max=
 function form_date($id, $value, $label=null, $format=null, $class=null) {
 	$ret = "";
 	if($label !== null) {
-		$ret = "<label for=\"". $id ."\">" . $label . "</label>\n";
+		$ret = "<label for=\"". $id ."\" class=\"control-label\">" . $label . "</label>\n";
 	}
 	$ret .= "<div data-date-format=\"";
 	if($format !== null) {
@@ -100,7 +100,7 @@ function form_date($id, $value, $label=null, $format=null, $class=null) {
 function form_file($id, $name="file", $label=null, $class=null) {
 	$ret = "";
 	if($label !== null) {
-		$ret = "<label for=\"". $id ."\">" . $label . "</label>\n";
+		$ret = "<label for=\"". $id ."\" class=\"control-label\">" . $label . "</label>\n";
 	}
 	$ret .= "<input id=\"" . $id . "\" type=\"file\" name=\"" . $name . "\">\n";
 	return $ret;
@@ -122,7 +122,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 	}
 	if ($type != "pick_multiple") {
 		if (!isset($args['nolabel']) || $args['nolabel'] === false) {
-			$ret .= "\t<label for=\"" . esc_attr($form_id . "-" . $field) . "\">";
+			$ret .= "\t<label for=\"" . esc_attr($form_id . "-" . $field) . "\" class=\"control-label\">";
 			$fieldLabel = $field;
 			if (substr($field, -2) == "Id") {
 				$fieldLabel = substr($field, 0, -2);
@@ -158,7 +158,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 			if ($object != NULL) {
 				$ret .= " value=\"" . esc_attr($object->{$field}) . "\"";
 			}
-			$ret .= "$required />\n";
+			$ret .= $required . ">\n";
 			break;
 		case 'boolean':
 			$ret .= "\t<input class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
@@ -172,7 +172,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 					$ret .= " checked=\"checked\"";
 				}
 			}
-			$ret .= " />\n";
+			$ret .= ">\n";
 			break;
 		case 'float':
 			if (!isset($args['step'])) {
@@ -186,7 +186,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 			if ($object != NULL) {
 				$ret .= " value=\"" . esc_attr($object->{$field}) . "\"";
 			}
-			$ret .= "$required />\n";
+			$ret .= $required . ">\n";
 			break;
 		case 'date':
 			// Class dateinput will be catched to show js date picker
@@ -205,7 +205,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 				}
 				$ret .= " value=\"" . esc_attr(\i18nDate($timestamp)) . "\"";
 			}
-			$ret .= "$required />\n";
+			$ret .= $required . ">\n";
 			break;
 		case 'pick':
 			$model = $args['model'];
@@ -290,7 +290,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 					$selected = ' checked="true"';
 				}
 				$id = $form_id . "-" . $field . "-" .$r->id;
-				$ret .= "\t<label for=\"" . esc_attr($id) . "\">" . esc_html($r->label) . "</label>\n";
+				$ret .= "\t<label for=\"" . esc_attr($id) . "\" class=\"control-label\">" . esc_html($r->label) . "</label>\n";
 				$ret .= "\t<input class=\"form-control\" id=\"" . esc_attr($id) . "\" type=\"checkbox\" name=\""
 					. esc_attr($name) . '[]" value="' . esc_attr($r->id) . '"'
 					. $selected . "/>\n";
@@ -306,7 +306,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 /** Create a select with given labels. For relation in a model use form_input
  * with type pick */
 function form_select($id, $label, $values, $labels, $currentValue=null) {
-	$ret =  "<label for=\"" . esc_attr($id) ."\">" . esc_html($label) . "</label>\n";
+	$ret =  "<label for=\"" . esc_attr($id) ."\" class=\"control-label\">" . esc_html($label) . "</label>\n";
 	$ret .=  "<select id=\"" . esc_attr($id) . "\" class=\"form-control\" name=\"" . esc_attr($id) . "\">\n";
 	for ($i = 0; $i < count($values); $i++) {
 		$selected = "";

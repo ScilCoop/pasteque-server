@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Stocks module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Cédric Houbart, Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -25,87 +26,77 @@ $error = null;
 $srv = new \Pasteque\TariffAreasService();
 
 if (isset($_POST['id'])) {
-    // Edit the area
-    $area = \Pasteque\TariffArea::__build($_POST['id'], $_POST['label'],
-            $_POST['dispOrder']);
-    foreach ($_POST as $key => $value) {
-        if (strpos($key, "price-") === 0) {
-            $productId = substr($key, 6);
-            $product = \Pasteque\ProductsService::get($productId);
-            $taxCat = \Pasteque\TaxesService::get($product->taxCatId);
-            $tax = $taxCat->getCurrentTax();
-            $price = $value / (1 + $tax->rate);
-            $area->addPrice($productId, $price);
-        }
-    }
-    if ($srv->update($area)) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-    }
+	// Edit the area
+	$area = \Pasteque\TariffArea::__build($_POST['id'], $_POST['label'],
+			$_POST['dispOrder']);
+	foreach ($_POST as $key => $value) {
+		if (strpos($key, "price-") === 0) {
+			$productId = substr($key, 6);
+			$product = \Pasteque\ProductsService::get($productId);
+			$taxCat = \Pasteque\TaxesService::get($product->taxCatId);
+			$tax = $taxCat->getCurrentTax();
+			$price = $value / (1 + $tax->rate);
+			$area->addPrice($productId, $price);
+		}
+	}
+	if ($srv->update($area)) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+	}
 } else if (isset($_POST['label'])) {
-    $area = new \Pasteque\TariffArea($_POST['label'],
-            $_POST['dispOrder']);
-    foreach ($_POST as $key => $value) {
-        if (strpos($key, "price-") === 0) {
-            $productId = substr($key, 6);
-            $product = \Pasteque\ProductsService::get($productId);
-            $taxCat = \Pasteque\TaxesService::get($product->taxCatId);
-            $tax = $taxCat->getCurrentTax();
-            $price = $value / (1 + $tax->rate);
-            $area->addPrice($productId, $price);
-        }
-    }
-    if ($srv->create($area)) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-    }
+	$area = new \Pasteque\TariffArea($_POST['label'],
+			$_POST['dispOrder']);
+	foreach ($_POST as $key => $value) {
+		if (strpos($key, "price-") === 0) {
+			$productId = substr($key, 6);
+			$product = \Pasteque\ProductsService::get($productId);
+			$taxCat = \Pasteque\TaxesService::get($product->taxCatId);
+			$tax = $taxCat->getCurrentTax();
+			$price = $value / (1 + $tax->rate);
+			$area->addPrice($productId, $price);
+		}
+	}
+	if ($srv->create($area)) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+	}
 }
 
 
 $area = null;
 if (isset($_GET['id'])) {
-    $area = $srv->get($_GET['id']);
+	$area = $srv->get($_GET['id']);
 }
 $categories = \Pasteque\CategoriesService::getAll();
-$products = \Pasteque\ProductsService::getAll(true);
+$products = \Pasteque\ProductsService::getAll();
 
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Tariff area", PLUGIN_NAME)));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
+
+$content = \Pasteque\form_hidden("edit", $area, "id");
+$content .= \Pasteque\form_input("edit", "TariffArea", $area, "label", "string", array("required" => true));
+$content .= \Pasteque\form_input("edit", "TariffArea", $area, "dispOrder", "numeric", array("required" => true));
+
+$content .= \Pasteque\vanillaDiv("", "catalog-picker");
+
+$table[0][0] = "";
+$table[0][1] = \i18n("Product.reference");
+$table[0][2] = \i18n("Product.label");
+$table[0][3] = \i18n("Price", PLUGIN_NAME);
+$table[0][4] = \i18n("Area price", PLUGIN_NAME);
+$content .= \Pasteque\standardTable($table);
+
+$content .= \Pasteque\form_send();
+
+echo \Pasteque\row(\Pasteque\form_generate(\Pasteque\get_current_url(), "post", $content));
+
+\Pasteque\init_catalog("catalog", "catalog-picker", "addProduct",
+        $categories, $products);
 ?>
-<h1><?php \pi18n("Tariff area", PLUGIN_NAME); ?></h1>
-
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
-
-<form class="edit" action="<?php echo \Pasteque\get_current_url(); ?>" id="edit" method="post">
-	<?php \Pasteque\form_hidden("edit", $area, "id"); ?>
-	<?php \Pasteque\form_input("edit", "TariffArea", $area, "label", "string", array("required" => true)); ?>
-	<?php \Pasteque\form_input("edit", "TariffArea", $area, "dispOrder", "numeric", array("required" => true)); ?>
-
-    <div id="catalog-picker"></div>
-
-	<table cellpadding="0" cellspacing="0">
-		<thead>
-			<tr>
-				<th></th>
-				<th><?php \pi18n("Product.reference"); ?></th>
-				<th><?php \pi18n("Product.label"); ?></th>
-				<th><?php \pi18n("Price", PLUGIN_NAME); ?></th>
-                <th><?php \pi18n("Area price", PLUGIN_NAME); ?></th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody id="list">
-		</tbody>
-	</table>
-
-	<div class="row actions">
-		<?php \Pasteque\form_send(); ?>
-	</div>
-
-</form>
-
-<?php \Pasteque\init_catalog("catalog", "catalog-picker", "addProduct",
-        $categories, $products); ?>
 <script type="text/javascript">
 
 	addProduct = function(productId) {
@@ -124,15 +115,19 @@ $products = \Pasteque\ProductsService::getAll(true);
 			return;
 		} else {
 			// Add line
+			var src = "?p=img&w=product";
+			if (product['hasImage']) {
+			    src += "&id=" + product['id'];
+			}
 			var html = "<tr id=\"line-" + product['id'] + "\">\n";
-			html += "<td><img class=\"thumbnail\" src=\"" + product['img'] + "\" /></td>\n";
-			html += "<td>" + product['reference'] + "</td>\n";
-			html += "<td>" + product['label'] + "</td>\n";
+			html += "\t<td><img class=\"thumbnail\" src=\"" + src + "\"></td>\n";
+			html += "\t<td>" + product['reference'] + "</td>\n";
+			html += "\t<td>" + product['label'] + "</td>\n";
 			html += "<td>" + product['vatSell'] + "</td>\n";
 			html += "<td class=\"price-cell\"><input class=\"price\" id=\"line-" + product['id'] + "\" type=\"numeric\" name=\"price-" + product['id'] + "\" value=\"" + price + "\" />\n";
 			html += "<td><a class=\"btn-delete\" href=\"\" onClick=\"javascript:deleteLine('" + product['id'] + "');return false;\"><?php \pi18n("Delete"); ?></a></td>\n";
-			html += "</tr>\n"; 
-			jQuery("#list").append(html);
+			html += "</tr>\n";
+			jQuery("tbody").append(html);
 		}
     }
 

@@ -2,7 +2,7 @@
 //    Pastèque Web back office, Stocks module
 //
 //    Copyright (C) 2013-2016 Scil (http://scil.coop)
-//        Philippe Pary philippe@scil.coop
+//        Cédric Houbart, Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -72,6 +72,7 @@ if ($multilocations) {
 	echo \Pasteque\row(\Pasteque\form_generate(\Pasteque\get_current_url(), "post", $content));
 }
 
+unset($content);
 foreach ($categories as $category) {
 	if (isset($prdCat[$category->id])) {
 		// Category header

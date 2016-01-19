@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office
 //
-//    Copyright (C) 2015 Scil (http://scil.coop)
+//    Copyright (C) 2015-2016 Scil (http://scil.coop)
+//         Cédric Houbart, Philippe Pary
 //
 //    This file is part of Pastèque.
 //
@@ -21,27 +22,27 @@
 namespace BaseStocks;
 
 $sql = "SELECT "
-    . "LOCATIONS.NAME AS NAME, PRODUCTS.NAME AS PRODUCTNAME, STOCKCURRENT.UNITS, STOCKLEVEL.STOCKSECURITY, STOCKLEVEL.STOCKMAXIMUM "
-    . "FROM STOCKCURRENT "
-    . "LEFT JOIN PRODUCTS ON STOCKCURRENT.PRODUCT = PRODUCTS.ID "
-    . "LEFT JOIN STOCKLEVEL ON STOCKCURRENT.PRODUCT = STOCKLEVEL.PRODUCT "
-    . "LEFT JOIN LOCATIONS ON LOCATIONS.ID = STOCKCURRENT.LOCATION "
-    . "WHERE (STOCKCURRENT.UNITS < STOCKLEVEL.STOCKSECURITY "
-    . "OR STOCKCURRENT.UNITS > STOCKLEVEL.STOCKMAXIMUM) "
-    . "OR STOCKCURRENT.UNITS < 0 "
-    . "ORDER BY STOCKLEVEL.LOCATION";
+	. "LOCATIONS.NAME AS NAME, PRODUCTS.NAME AS PRODUCTNAME, STOCKCURRENT.UNITS, STOCKLEVEL.STOCKSECURITY, STOCKLEVEL.STOCKMAXIMUM "
+	. "FROM STOCKCURRENT "
+	. "LEFT JOIN PRODUCTS ON STOCKCURRENT.PRODUCT = PRODUCTS.ID "
+	. "LEFT JOIN STOCKLEVEL ON STOCKCURRENT.PRODUCT = STOCKLEVEL.PRODUCT "
+	. "LEFT JOIN LOCATIONS ON LOCATIONS.ID = STOCKCURRENT.LOCATION "
+	. "WHERE (STOCKCURRENT.UNITS < STOCKLEVEL.STOCKSECURITY "
+	. "OR STOCKCURRENT.UNITS > STOCKLEVEL.STOCKMAXIMUM) "
+	. "OR STOCKCURRENT.UNITS < 0 "
+	. "ORDER BY STOCKLEVEL.LOCATION";
 
 $fields = array("NAME","PRODUCTNAME","UNITS","STOCKSECURITY","STOCKMAXIMUM");
 $headers = array(
-    \i18n("Location.label"),
-    \i18n("Product.label"),
-    \i18n("Quantity"),
-    \i18n("QuantityMin"),
-    \i18n("QuantityMax")
+		\i18n("Location.label"),
+		\i18n("Product.label"),
+		\i18n("Quantity"),
+		\i18n("QuantityMin"),
+		\i18n("QuantityMax")
 );
 
 $report = new \Pasteque\Report(PLUGIN_NAME, "alert",
-    \i18n("Stock.AlertReport"),
-    $sql, $headers, $fields);
+		\i18n("Stock.AlertReport"),
+		$sql, $headers, $fields);
 
 \Pasteque\register_report($report);

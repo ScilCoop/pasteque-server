@@ -39,6 +39,7 @@ echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Tariff areas", PLUGIN_NAME)));
 //Buttons
 $buttons = \Pasteque\addButton(\i18n("Add an area", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "area_edit"));
 $buttons .= \Pasteque\importButton(\i18n("Import areas", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "areas_import"));
+echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
 //Information
 \Pasteque\tpl_msg_box($message, $error);
 //Counter
@@ -55,6 +56,7 @@ else {
 		$btn_group = \Pasteque\editButton(\i18n("Edit", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "area_edit", array("id" => $area->id)));
 		$btn_group .= \Pasteque\deleteButton(\i18n("Delete", PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-area=" . $area->id);
 		$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
 	}
 	echo \Pasteque\row(\Pasteque\standardTable($content));
 }

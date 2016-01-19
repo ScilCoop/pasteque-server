@@ -135,31 +135,10 @@ echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
 //Information
 \Pasteque\tpl_msg_box($message, $error);
 
-if ($multilocations) {
-	$content .= \Pasteque\row(\Pasteque\form_select("location", \i18n("Location"), $locIds, $locNames, null));
-	$content .= \Pasteque\row(\Pasteque\form_select("destination", \i18n("Destination"), $locIds, $locNames, null));
-}
-$content .= \Pasteque\row(\Pasteque\form_file("file","csv",\i18n("Load csv file", PLUGIN_NAME)));
-$content .= \Pasteque\row(\Pasteque\form_button(\i18n("Load", PLUGIN_NAME)));
-
-$content .= \Pasteque\row(\Pasteque\vanillaDiv("","catalog-picker"));
-
-$table[0][0] = "";
-$table[0][1] = \i18n("Product.reference");
-$table[0][2] = \i18n("Product.label");
-$table[0][3] = \i18n("Quantity");
-$table[0][4] = "";
-$content .= \Pasteque\row(\Pasteque\standardTable($table));
-
-$content .= \Pasteque\row(\Pasteque\form_save());
-
-echo \Pasteque\row(\Pasteque\form_generate(\Pasteque\get_current_url(),"post",$content));
-\Pasteque\init_catalog("catalog", "catalog-picker", "addProduct",
-        $categories, $products);
-
 if ($countedStock !== null) {
 	foreach ($categories as $category) {
 		$printed = false;
+		$i = 1;
 		if (isset($prdCat[$category->id])) {
 			foreach ($prdCat[$category->id] as $product) {
 				$counted = 0;
@@ -178,44 +157,51 @@ if ($countedStock !== null) {
 					}
 					if (!$printed) {
 						$printed = true;
-						?>
-							<h3><?php echo \Pasteque\esc_html($category->label); ?></h3>
-							<table cellpadding="0" cellspacing="0">
-							<thead>
-							<tr>
-							<th></th>
-							<th><?php \pi18n("Product.reference"); ?></th>
-							<th><?php \pi18n("Product.label"); ?></th>
-							<th><?php \pi18n("Counted stock", PLUGIN_NAME); ?></th>
-							<th><?php \pi18n("Actual stock", PLUGIN_NAME); ?></th>
-							<th><?php \pi18n("Difference", PLUGIN_NAME); ?></th>
-							</tr>
-							</thead>
-							<tbody>
-							<?php
-					}
-					?>
-						<tr>
-						<td><img class="thumbnail" src="?<?php echo $imgSrc ?>" />
-						<td><?php echo $product->reference; ?></td>
-						<td><?php echo $product->label; ?></td>
-						<td><?php echo $counted ?></td>
-						<td><?php echo $actual; ?></td>
-						<td><?php echo $counted - $actual; ?></td>
-						</tr>
-						<?php
-
+						echo \Pasteque\row(\Pasteque\secondaryTitle($category->label));
+						$content[0][0] = "";
+						$content[0][1] = \i18n("Product.reference");
+						$content[0][2] = \i18n("Product.label");
+						$content[0][3] = \i18n("Counted stock", PLUGIN_NAME);
+						$content[0][4] = \i18n("Actual stock", PLUGIN_NAME);
+						$content[0][5] = \i18n("Difference", PLUGIN_NAME);
+				}
+				$content[$i][0] = "<img class=\"thumbnail\" src=\"?" . $imgSrc . "\">";
+				$content[$i][1] = $product->reference;
+				$content[$i][2] = $product->label;
+				$content[$i][3] = $counted;
+				$content[$i][4] = $actual;
+				$content[$i][5] = $counted - $actual;
+				$i++;
 				}
 			}
-			?>
-				</tbody>
-				</table>
-				<?php
-
+			echo \Pasteque\row(\Pasteque\standardTable($content));
 		}
 	}
 } // end of stock comparison
+else {
+	// FORM
+	$content .= \Pasteque\form_value_hidden("","send","true");
+	if ($multilocations) {
+		$content .= \Pasteque\row(\Pasteque\form_select("location", \i18n("Location"), $locIds, $locNames, null));
+		$content .= \Pasteque\row(\Pasteque\form_select("destination", \i18n("Destination"), $locIds, $locNames, null));
+	}
+	$content .= \Pasteque\row(\Pasteque\form_file("file","csv",\i18n("Load csv file", PLUGIN_NAME)));
+	$content .= \Pasteque\row(\Pasteque\form_button(\i18n("Load", PLUGIN_NAME)));
 
+	$content .= \Pasteque\row(\Pasteque\vanillaDiv("","catalog-picker"));
+
+	$table[0][0] = "";
+	$table[0][1] = \i18n("Product.reference");
+	$table[0][2] = \i18n("Product.label");
+	$table[0][3] = \i18n("Quantity");
+	$table[0][4] = "";
+	$content .= \Pasteque\row(\Pasteque\standardTable($table));
+	$content .= \Pasteque\row(\Pasteque\form_send());
+
+	echo \Pasteque\row(\Pasteque\form_generate(\Pasteque\get_current_url(),"post",$content));
+	\Pasteque\init_catalog("catalog", "catalog-picker", "addProduct",
+		$categories, $products);
+}
 ?>
 <script type="text/javascript">
 	addProduct = function(productId) {

@@ -19,9 +19,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Pastèque.  If not, see <http://www.gnu.org/licenses/>.
 
-// discounts action
-
-namespace TicketProducts;
+namespace TicketDiscounts;
 
 $message = NULL;
 $error = NULL;
@@ -61,7 +59,7 @@ else {
 		$content[$i][1] = $discount->startDate;
 		$content[$i][2] = $discount->endDate;
 		$content[$i][3] = $discount->rate;
-		$btn_group = \Pasteque\editButton(\i18n("Edit", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "discount_edit", array("id" => $discount->id)));
+		$btn_group = \Pasteque\editButton(\i18n("Edit"), \Pasteque\get_module_url_action(PLUGIN_NAME, "discount_edit", array("id" => $discount->id)));
 		$btn_group .= \Pasteque\deleteButton(\i18n("Delete", PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-discount=" . $discount->id);
 		$content[$i][3] .= \Pasteque\buttonGroup($btn_group, "pull-right");
 		$i++;

@@ -2,7 +2,7 @@
 //    Pastèque Web back office, Users module
 //
 //    Copyright (C) 2013-2016 Scil (http://scil.coop)
-//        Philippe Pary philippe@scil.coop
+//        Cédric Houbart, Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -25,8 +25,8 @@ $message = null;
 $error = null;
 $srv = new \Pasteque\DiscountProfilesService();
 
-if (isset($_POST['delete-profile'])) {
-	if ($srv->delete($_POST['delete-profile'])) {
+if (isset($_GET['delete-profile'])) {
+	if ($srv->delete($_GET['delete-profile'])) {
 		$message = \i18n("Changes saved");
 	} else {
 		$error = \i18n("Unable to save changes");
@@ -39,6 +39,7 @@ $profiles = $srv->getAll();
 echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Discount profiles", PLUGIN_NAME)));
 //Buttons
 $buttons = \Pasteque\addButton(\i18n("New discount profile", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "discountprofile_edit"));
+echo \Pasteque\buttonGroup($buttons);
 //Informations
 \Pasteque\tpl_msg_box($message,$error);
 //Counter
@@ -54,7 +55,8 @@ else {
 	foreach ($profiles as $profile) {
 		$content[$i][0] = $profile->label;
 		$content[$i][1] = $profile->rate;
-		$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'discountprofile_edit', array("id" => $profile->id)));
+		$btn_group = \Pasteque\editButton(\i18n('Edit'), \Pasteque\get_module_url_action(PLUGIN_NAME, 'discountprofile_edit', array("id" => $profile->id)));
+		$btn_group .= \Pasteque\deleteButton(\i18n("Delete", PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-profile=" . $profile->id);
 		$content[$i][1] .= \Pasteque\buttonGroup($btn_group, "pull-right");
 		$i++;
 	}

@@ -1,8 +1,8 @@
 <?php
-//    Pastèque Web back office
+//    Pastèque Web back office, Products module
 //
 //    Copyright (C) 2016 Scil (http://scil.coop)
-//          Philippe Pary philippe@scil.coop
+//        Philippe Pary
 //
 //    This file is part of Pastèque.
 //
@@ -18,10 +18,15 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with Pastèque.  If not, see <http://www.gnu.org/licenses/>.
-namespace Pasteque;
 
-function row($content) {
-	$row = sprintf("<div class=\"row spacing-row\">\n\t%s</div>\n",$content);
-	return $row;
-}
-?>
+namespace TicketDiscounts;
+
+$message = NULL;
+$error = NULL;
+
+//Title
+echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Discount edit", PLUGIN_NAME)));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
+
+// TODO : ALL
