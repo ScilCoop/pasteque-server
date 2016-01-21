@@ -25,8 +25,8 @@ namespace BaseProducts;
 
 $message = NULL;
 $error = NULL;
-if (isset($_POST['delete-cat'])) {
-	if (\Pasteque\CategoriesService::deleteCat($_POST['delete-cat'])) {
+if (isset($_GET['delete-cat'])) {
+	if (\Pasteque\CategoriesService::deleteCat($_GET['delete-cat'])) {
 		$message = \i18n("Changes saved");
 	} else {
 		$error = \i18n("Unable to save changes");

@@ -45,7 +45,7 @@ function form_value_hidden($form_id, $name, $value) {
 		. "\" value=\"" . esc_attr($value) . "\"/>\n";
 }
 
-function form_number($id, $value=null, $label=null, $step=null, $min=null, $max=null, $class=null) {
+function form_number($id, $value=null, $label=null, $step=null, $min=null, $max=null, $class=null, $readonly=false) {
 	$ret = "";
 	if($label !== null) {
 		$ret = "<label for=\"" . $id . "\" class=\"control-label\">" . $label . "</label>\n";
@@ -66,6 +66,9 @@ function form_number($id, $value=null, $label=null, $step=null, $min=null, $max=
 	}
 	if($max !== null) {
 		$ret .= " max=\"" . $max . "\"";
+	}
+	if($readonly) {
+		$ret .= " readonly=\"true\"";
 	}
 	$ret .= ">\n";
 	return $ret;

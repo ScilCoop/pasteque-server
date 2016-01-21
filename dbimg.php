@@ -106,7 +106,7 @@ case 'provider':
     if (isset($_GET['id'])) {
         $prov = ProvidersService::get($_GET['id']);
         if ($prov !== null && $prov->hasImage !== false) {
-            $img = ProvidersService::getImage($prov->id);
+            echo ProvidersService::getImage($prov->id);
             break;
         }
     }
