@@ -33,6 +33,10 @@ function esc_js($value) {
 	return addslashes($value);
 }
 
+function label_for($text,$form_id) {
+	return "<label for=\"" . $form_id . "\">" . $text . "</label>\n";
+}
+
 function form_hidden($form_id, $object, $field) {
 	if ($object != NULL && isset($object->{$field})) {
 		return "<input type=\"hidden\" name=\"" . esc_attr($field) . "\" value=\""
@@ -45,12 +49,32 @@ function form_value_hidden($form_id, $name, $value) {
 		. "\" value=\"" . esc_attr($value) . "\"/>\n";
 }
 
+function form_text($id, $value=null, $label=null, $class=null, $js=null) {
+	$ret = "";
+	if($label !== null) {
+		$ret = "<label for=\"" . $id . "\" class=\"control-label\">" . $label . "</label>\n";
+	}
+	$ret .= "<input type=\"text\" id=\"" . $id . "\" name=\"" . $id . "\" class=\"form-control";
+	if($class !== null) {
+		$ret .= " " .$class;
+	}
+	$ret .= "\"";
+	if($value !== null) {
+		$ret .= " value=\"" . $value . "\"";
+	}
+	if($js !== null) {
+		$ret .= " onchange=\"" . $js . "\"";
+	}
+	$ret .= ">\n";
+	return $ret;
+}
+
 function form_number($id, $value=null, $label=null, $step=null, $min=null, $max=null, $class=null, $readonly=false) {
 	$ret = "";
 	if($label !== null) {
 		$ret = "<label for=\"" . $id . "\" class=\"control-label\">" . $label . "</label>\n";
 	}
-	$ret .= "<input type=\"number\" class=\"form-control";
+	$ret .= "<input type=\"number\" id=\"" . $id . "\" name=\"" . $id . "\" class=\"form-control";
 	if($class !== null) {
 		$ret .= " " .$class;
 	}
@@ -323,8 +347,14 @@ function form_select($id, $label, $values, $labels, $currentValue=null) {
 	return $ret;
 }
 
-function form_generate($action,$method,$content) {
-	$ret = sprintf("<form class=\"form-horizontal\" action=\"%s\" method=\"%s\" enctype=\"multipart/form-data\">\n",$action,$method);
+function form_generate($action,$method,$content,$js=null) {
+	if($js !== null) {
+		$ret = sprintf("<form class=\"form-horizontal\" action=\"%s\" method=\"%s\" onsubmit=\"%s\" enctype=\"multipart/form-data\">\n",$action,$method,$js);
+	}
+	else {
+		$ret = sprintf("<form class=\"form-horizontal\" action=\"%s\" method=\"%s\" enctype=\"multipart/form-data\">\n",$action,$method);
+
+	}
 	$ret .= sprintf("%s",$content);
 	$ret .= "</form>\n";
 	return $ret;

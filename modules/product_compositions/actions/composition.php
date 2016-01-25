@@ -2,7 +2,7 @@
 //    Pastèque Web back office, Products module
 //
 //    Copyright (C) 2013-2016 Scil (http://scil.coop)
-//        Philippe Pary philippe@scil.coop
+//        Cédric Houbart, Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -23,8 +23,8 @@ namespace ProductCompositions;
 
 $message = NULL;
 $error = NULL;
-if (isset($_POST['delete-comp'])) {
-	if (\Pasteque\CompositionsService::delete($_POST['delete-comp'])) {
+if (isset($_GET['delete-comp'])) {
+	if (\Pasteque\CompositionsService::delete($_GET['delete-comp'])) {
 		$message = \i18n("Changes saved");
 	} else {
 		$error = \i18n("Unable to save changes");
@@ -44,7 +44,7 @@ echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
 echo \Pasteque\row(\Pasteque\counterDiv(\i18n("%d compositions", PLUGIN_NAME, count($compositions))));
 
 if (count($compositions) == 0) {
-	echo \Pasteque\errorDiv(\i18n("No category found", PLUGIN_NAME));
+	echo \Pasteque\errorDiv(\i18n("No composition found", PLUGIN_NAME));
 }
 else {
 	$content[0][0] = \i18n("Composition.label");
