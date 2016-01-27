@@ -34,7 +34,7 @@ function esc_js($value) {
 }
 
 function label_for($text,$form_id) {
-	return "<label for=\"" . $form_id . "\">" . $text . "</label>\n";
+	return "<label class=\"col-sm-2\" for=\"" . $form_id . "\">" . $text . "</label>\n";
 }
 
 function form_hidden($form_id, $object, $field) {
@@ -50,11 +50,12 @@ function form_value_hidden($form_id, $name, $value) {
 }
 
 function form_text($id, $value=null, $label=null, $class=null, $js=null) {
-	$ret = "";
+	$ret = "<div class=\"form-group row\">\n";
 	if($label !== null) {
-		$ret = "<label for=\"" . $id . "\" class=\"control-label\">" . $label . "</label>\n";
+		$ret .= "\t<label for=\"" . $id . "\" class=\"col-sm-2 control-label\">" . $label . "</label>\n";
 	}
-	$ret .= "<input type=\"text\" id=\"" . $id . "\" name=\"" . $id . "\" class=\"form-control";
+	$ret .= "\t<div class=\"col-sm-10\">\n";
+	$ret .= "\t\t<input type=\"text\" id=\"" . $id . "\" name=\"" . $id . "\" class=\"form-control";
 	if($class !== null) {
 		$ret .= " " .$class;
 	}
@@ -66,15 +67,18 @@ function form_text($id, $value=null, $label=null, $class=null, $js=null) {
 		$ret .= " onchange=\"" . $js . "\"";
 	}
 	$ret .= ">\n";
+	$ret .= "\t</div>\n";
+	$ret .= "</div>\n";
 	return $ret;
 }
 
 function form_number($id, $value=null, $label=null, $step=null, $min=null, $max=null, $class=null, $readonly=false) {
-	$ret = "";
+	$ret = "<div class=\"form-group row\">\n";
 	if($label !== null) {
-		$ret = "<label for=\"" . $id . "\" class=\"control-label\">" . $label . "</label>\n";
+		$ret .= "\t<label for=\"" . $id . "\" class=\"col-sm-2 control-label\">" . $label . "</label>\n";
 	}
-	$ret .= "<input type=\"number\" id=\"" . $id . "\" name=\"" . $id . "\" class=\"form-control";
+	$ret .= "\t<div class=\"col-sm-10\">\n";
+	$ret .= "\t\t<input type=\"number\" id=\"" . $id . "\" name=\"" . $id . "\" class=\"form-control";
 	if($class !== null) {
 		$ret .= " " .$class;
 	}
@@ -95,41 +99,47 @@ function form_number($id, $value=null, $label=null, $step=null, $min=null, $max=
 		$ret .= " readonly=\"true\"";
 	}
 	$ret .= ">\n";
+	$ret .= "\t</div>\n";
+	$ret .= "</div>\n";
 	return $ret;
 }
 
 function form_date($id, $value, $label=null, $format=null, $class=null) {
-	$ret = "";
+	$ret = "<div class=\"form-group row\">\n";
 	if($label !== null) {
-		$ret = "<label for=\"". $id ."\" class=\"control-label\">" . $label . "</label>\n";
+		$ret = "\t<label for=\"". $id ."\" class=\"col-sm-2 control-label\">" . $label . "</label>\n";
 	}
-	$ret .= "<div data-date-format=\"";
+	$ret .= "\t<div data-date-format=\"";
 	if($format !== null) {
 		$ret .= $format;
 	}
 	else {
 		$ret .= "yyyy-mm-dd";
 	}
-	$ret .= "\" class=\"input-group date";
+	$ret .= "\" class=\"col-sm-10 input-group date";
 	if($class !== null) {
 		$ret .= $class;
 	}
 	$ret .= "\">\n";
-	$ret .= "\t<input type=\"text\" class=\"form-control\" name=\"";
+	$ret .= "\t\t<input type=\"text\" class=\"form-control\" name=\"";
 	$ret .= $id . "\" id=\"" . $id . "\" value=\"" . $value . "\">\n";
-	$ret .= "\t<div class=\"input-group-addon\">\n";
-	$ret .= "\t\t<span class=\"glyphicon glyphicon-th\"></span>\n";
+	$ret .= "\t\t<div class=\"input-group-addon\">\n";
+	$ret .= "\t\t\t<span class=\"glyphicon glyphicon-th\"></span>\n";
+	$ret .= "\t\t</div>\n";
 	$ret .= "\t</div>\n";
 	$ret .= "</div>\n";
 	return $ret;
 }
 
 function form_file($id, $name="file", $label=null, $class=null) {
-	$ret = "";
+	$ret = "<div class=\"form-group row\">\n";
 	if($label !== null) {
-		$ret = "<label for=\"". $id ."\" class=\"control-label\">" . $label . "</label>\n";
+		$ret = "\t<label for=\"". $id ."\" class=\"col-sm-2 control-label\">" . $label . "</label>\n";
 	}
-	$ret .= "<input id=\"" . $id . "\" type=\"file\" name=\"" . $name . "\">\n";
+	$ret .= "\t<div class=\"col-sm-10\">\n";
+	$ret .= "\t\t<input id=\"" . $id . "\" type=\"file\" name=\"" . $name . "\">\n";
+	$ret .= "\t</div>\n";
+	$ret .= "</div>\n";
 	return $ret;
 
 }
@@ -137,7 +147,7 @@ function form_file($id, $name="file", $label=null, $class=null) {
 function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 	$ret = "";
 	if (!isset($args['nolabel']) || $args['nolabel'] === false) {
-		$ret .= "<div class=\"form-group\">\n";
+		$ret .= "<div class=\"form-group row\">\n";
 	}
 	if (isset($args['nameid']) && $args['nameid'] == true) {
 		$name = $field . "-" . $form_id;
@@ -149,7 +159,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 	}
 	if ($type != "pick_multiple") {
 		if (!isset($args['nolabel']) || $args['nolabel'] === false) {
-			$ret .= "\t<label for=\"" . esc_attr($form_id . "-" . $field) . "\" class=\"control-label\">";
+			$ret .= "\t<label for=\"" . esc_attr($form_id . "-" . $field) . "\" class=\"col-sm-2 control-label\">";
 			$fieldLabel = $field;
 			if (substr($field, -2) == "Id") {
 				$fieldLabel = substr($field, 0, -2);
@@ -162,9 +172,10 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 	if (isset($args['required']) && $args['required']) {
 		$required = " required=\"true\"";
 	}
+	$ret .= "\t<div class=\"col-sm-10\">\n";
 	switch ($type) {
 		case 'string':
-			$ret .= "\t<input class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
+			$ret .= "\t\t<input class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
 				. "\" type=\"text\" name=\"" . esc_attr($name) . "\"";
 			if ($object != NULL) {
 				$ret .= " value=\"" . esc_attr($object->{$field}) . "\"";
@@ -172,7 +183,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 			$ret .= "$required />\n";
 			break;
 		case 'text':
-			$ret .= "\t<textarea class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
+			$ret .= "\t\t<textarea class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
 				. "\" name=\"" . esc_attr($name) . "\">";
 			if ($object != NULL) {
 				$ret .= esc_html($object->{$field});
@@ -180,7 +191,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 			$ret .= "</textarea>";
 			break;
 		case 'numeric':
-			$ret .= "\t<input class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
+			$ret .= "\t\t<input class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
 				. "\" type=\"numeric\" name=\"" . esc_attr($name) . "\"";
 			if ($object != NULL) {
 				$ret .= " value=\"" . esc_attr($object->{$field}) . "\"";
@@ -188,7 +199,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 			$ret .= $required . ">\n";
 			break;
 		case 'boolean':
-			$ret .= "\t<input class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
+			$ret .= "\t\t<input class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
 				. "\" type=\"checkbox\" name=\"" . esc_attr($name) . "\"";
 			if ($object != NULL) {
 				if ($object->{$field}){
@@ -207,7 +218,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 			} else {
 				$step = $args['step'];
 			}
-			$ret .= "\t<input class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
+			$ret .= "\t\t<input class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
 				. "\" type=\"number\" step=\"" . esc_attr($step)
 				. "\" min=\"0.00\" name=\"" . esc_attr($name) . "\"";
 			if ($object != NULL) {
@@ -217,7 +228,7 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 			break;
 		case 'date':
 			// Class dateinput will be catched to show js date picker
-			$ret .= "\t<input class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
+			$ret .= "\t\t<input class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
 				. "\" type=\"text\" class=\"dateinput\" name=\"" . esc_attr($name) . "\"";
 			if ($object !== null) {
 				if (isset($args['dataformat'])) {
@@ -281,10 +292,10 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 						break;
 				}
 			}
-			$ret .= "\t<select class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
+			$ret .= "\t\t<select class=\"form-control\" id=\"" . esc_attr($form_id . "-" . $field)
 				. "\" name=\"" . esc_attr($name) . "\">\n";
 			if (isset($args['nullable']) && $args['nullable']) {
-				$ret .= "\t\t<option value=\"\"></option>\n";
+				$ret .= "\t\t\t<option value=\"\"></option>\n";
 			}
 			foreach ($data as $r) {
 				$selected = "";
@@ -298,10 +309,10 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 							|| (is_object($object->{$field}) && $object->{$field}->id == $r_id))) {
 					$selected = " selected=\"true\"";
 				}
-				$ret .= "\t\t<option value=\"" . esc_attr($r_id) . "\"" . $selected . ">"
+				$ret .= "\t\t\t<option value=\"" . esc_attr($r_id) . "\"" . $selected . ">"
 					. esc_html($r_label) . "</option>\n";
 			}
-			$ret .= "</select>\n";
+			$ret .= "\t\t</select>\n";
 			break;
 		case 'pick_multiple':
 			$model = $args['model'];
@@ -317,13 +328,14 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 					$selected = ' checked="true"';
 				}
 				$id = $form_id . "-" . $field . "-" .$r->id;
-				$ret .= "\t<label for=\"" . esc_attr($id) . "\" class=\"control-label\">" . esc_html($r->label) . "</label>\n";
-				$ret .= "\t<input class=\"form-control\" id=\"" . esc_attr($id) . "\" type=\"checkbox\" name=\""
+				$ret .= "\t\t<label for=\"" . esc_attr($id) . "\" class=\"control-label\">" . esc_html($r->label) . "</label>\n";
+				$ret .= "\t\t<input class=\"form-control\" id=\"" . esc_attr($id) . "\" type=\"checkbox\" name=\""
 					. esc_attr($name) . '[]" value="' . esc_attr($r->id) . '"'
 					. $selected . "/>\n";
 			}
 			break;
 	}
+	$ret .= "\t</div>\n";
 	if (!isset($args['nolabel']) || $args['nolabel'] === false) {
 		$ret .= "</div>\n";
 	}
@@ -333,17 +345,21 @@ function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 /** Create a select with given labels. For relation in a model use form_input
  * with type pick */
 function form_select($id, $label, $values, $labels, $currentValue=null) {
-	$ret =  "<label for=\"" . esc_attr($id) ."\" class=\"control-label\">" . esc_html($label) . "</label>\n";
-	$ret .=  "<select id=\"" . esc_attr($id) . "\" class=\"form-control\" name=\"" . esc_attr($id) . "\">\n";
+	$ret = "<div class=\"form-group\">\n";
+	$ret .= "\t<label for=\"" . esc_attr($id) ."\" class=\"col-sm-2 control-label\">" . esc_html($label) . "</label>\n";
+	$ret .= "\t<div class=\"col-sm-10\">\n";
+	$ret .=  "\t\t<select id=\"" . esc_attr($id) . "\" class=\"form-control\" name=\"" . esc_attr($id) . "\">\n";
 	for ($i = 0; $i < count($values); $i++) {
 		$selected = "";
 		if ($values[$i] === $currentValue) {
 			$selected = ' selected="true"';
 		}
-		$ret .=  "<option value=\"" . esc_attr($values[$i]) . "\"" . $selected . ">"
+		$ret .=  "\t\t\t<option value=\"" . esc_attr($values[$i]) . "\"" . $selected . ">"
 			. esc_html($labels[$i]) . "</option>\n";
 	}
-	$ret .=  "</select>\n";
+	$ret .= "\t\t</select>\n";
+	$ret .= "\t</div>\n";
+	$ret .= "</div>\n";
 	return $ret;
 }
 
@@ -361,7 +377,7 @@ function form_generate($action,$method,$content,$js=null) {
 }
 
 function form_fieldset($legend,$content) {
-	return sprintf("<fieldset>\n\t<legend>%s</legend>\n%s\n</fieldset>\n",$legend,$content);
+	return sprintf("<fieldset class=\"form-group\">\n\t<legend>%s</legend>\n%s\n</fieldset>\n",$legend,$content);
 }
 
 function form_button($text,$class=null) {
@@ -374,11 +390,11 @@ function form_button($text,$class=null) {
 }
 
 function form_send() {
-	return "<button class=\"btn btn-primary btn-send\" type=\"submit\">" . \i18n("Send") . "</button>\n";
+	return "<div class=\"form-group\"><button class=\"btn btn-primary btn-send\" type=\"submit\">" . \i18n("Send") . "</button></div>\n";
 }
 
 function form_save() {
-	return "<button class=\"btn btn-primary btn-send\" type=\"submit\">" . \i18n("Save") . "</button>\n";
+	return "<div class=\"form-group\"><button class=\"btn btn-primary btn-send\" type=\"submit\">" . \i18n("Save") . "</button></div>\n";
 }
 
 function form_delete($what, $id, $img_src = NULL) {
