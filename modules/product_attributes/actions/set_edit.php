@@ -35,60 +35,40 @@ if (isset($_POST['id'])) {
 	}
 	\Pasteque\AttributesService::updateSet($set);
 } else if (isset($_POST['label'])) {
-    // Create attribute
-    $set = new \Pasteque\AttributeSet($_POST['label']);
-    foreach ($_POST['id-attr'] as $attrId) {
-        if ($attrId !== null && $attrId !== "") {
-            $attr = \Pasteque\Attribute::__build($attrId, "unused", null);
-            $set->addAttribute($attr, null);
-        }
-    }
-    \Pasteque\AttributesService::createSet($set);
+	// Create attribute
+	$set = new \Pasteque\AttributeSet($_POST['label']);
+	foreach ($_POST['id-attr'] as $attrId) {
+		if ($attrId !== null && $attrId !== "") {
+			$attr = \Pasteque\Attribute::__build($attrId, "unused", null);
+			$set->addAttribute($attr, null);
+		}
+	}
+	\Pasteque\AttributesService::createSet($set);
 }
 
 $set = null;
 if (isset($_GET['id'])) {
-    $set = \Pasteque\AttributesService::get($_GET['id']);
+	$set = \Pasteque\AttributesService::get($_GET['id']);
 }
+
+//Title
+echo \Pasteque\mainTitle(\i18n("Edit attribute set", PLUGIN_NAME));
+//Information
+\Pasteque\tpl_msg_box($message, $error);
+
+$content = \Pasteque\form_hidden("edit", $set, "id");
+$content .= \Pasteque\form_fieldset(\i18n("Attribute set", PLUGIN_NAME), \Pasteque\form_input("edit", "AttributeSet", $set, "label", "string", array("required" => true)));
+$table[0][0] = \i18n("AttributeSet.label");
+$i = 1;
+if ($set !== null) {
+	foreach ($set->attributes as $value) {
+		$table[$i][0] = \Pasteque\form_input("attr", "Attribute", $value, "id", "pick", array("model" => "Attribute", "nullable" => true, "nolabel" => true, "array" => true, "nameid" => true));
+		$i++;
+	}
+}
+$table[$i][0] = \Pasteque\form_input("attr", "Attribute", null, "id", "pick", array("model" => "Attribute", "nullable" => true, "nolabel" => true, "array" => true, "nameid" => true));
+$content .= \Pasteque\standardTable($table);
+$content .= \Pasteque\form_save();
+
+echo \Pasteque\form_generate(\Pasteque\get_current_url(), "post", $content);
 ?>
-<h1><?php \pi18n("Edit attribute set", PLUGIN_NAME); ?></h1>
-
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
-
-<!-- Attribute edit -->
-<form class="edit" action="<?php echo \Pasteque\get_current_url(); ?>" method="post">
-	<fieldset>
-		<legend><?php \pi18n("Attribute set", PLUGIN_NAME); ?></legend>
-		<?php \Pasteque\form_hidden("edit", $set, "id"); ?>
-		<?php \Pasteque\form_input("edit", "AttributeSet", $set, "label", "string", array("required" => true)); ?>
-	</fieldset>
-	<table cellpadding="0" cellspacing="0">
-		<thead>
-			<tr>
-				<th><?php \pi18n("AttributeSet.label"); ?></th>
-			</tr>
-		</thead>
-		<tbody id="list">
-	<?php if ($set !== null) { foreach ($set->attributes as $value) { ?>
-		<tr id="line-<?php echo $value->id; ?>">
-			<td><?php \Pasteque\form_input("attr", "Attribute", $value, "id", "pick", array("model" => "Attribute", "nullable" => true, "nolabel" => true, "array" => true, "nameid" => true)); ?></td>
-		</tr>
-	<?php } } ?>
-	<?php for ($i = 0; $i < 5; $i++) { ?>
-		<tr>
-			<td><?php \Pasteque\form_input("attr", "Attribute", null, "id", "pick", array("model" => "Attribute", "nullable" => true, "nolabel" => true, "array" => true, "nameid" => true)); ?></td>
-		</tr>
-	<?php } ?>
-		</tbody>
-	</table>
-
-	<div class="row actions">
-		<?php \Pasteque\form_save(); ?>
-	</div>
-	
-</form>
-<?php if ($set !== null) { ?>
-<form action="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'sets'); ?>" method="post">
-	<?php \Pasteque\form_delete("set", $set->id); ?>
-</form>
-<?php } ?>

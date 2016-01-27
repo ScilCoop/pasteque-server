@@ -24,8 +24,8 @@ namespace ProductAttributes;
 $message = null;
 $error = null;
 
-if (isset($_POST['delete-attribute'])) {
-	if (\Pasteque\AttributesService::deleteAttribute($_POST['delete-attribute'])) {
+if (isset($_GET['delete-attribute'])) {
+	if (\Pasteque\AttributesService::deleteAttribute($_GET['delete-attribute'])) {
 		$message = \i18n("Changes saved");
 	} else {
 		$error = \i18n("Unable to save changes");
@@ -54,6 +54,7 @@ else {
 		$btn_group = \Pasteque\editButton(\i18n("Edit", PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, "attribute_edit", array("id" => $attr->id)));
 		$btn_group .= \Pasteque\deleteButton(\i18n("Delete", PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-attribute=" . $attr->id);
 		$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
 	}
 	echo \Pasteque\row(\Pasteque\standardTable($content));
 }

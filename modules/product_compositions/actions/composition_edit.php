@@ -153,9 +153,9 @@ if ($composition !== null && $composition->hasImage === true) {
 $content .= \Pasteque\form_fieldset($legend,$displayData);
 
 $legend = \i18n("Price", PLUGIN_NAME);
-$displayData = \Pasteque\form_input("edit", "Product", $composition, "taxCatId", "pick", array("model" => "TaxCategory"));
+$displayData = \Pasteque\form_value_hidden("realsell","realsell",$product->priceSell);
+$displayData .= \Pasteque\form_input("edit", "Product", $composition, "taxCatId", "pick", array("model" => "TaxCategory"));
 $displayData .= \Pasteque\form_number("sellvat", $vatprice, \i18n("Sell price + taxes", PLUGIN_NAME),"0.1");
-$displayData .= \Pasteque\form_hidden("realsell","realsell",$composition->priceSell);
 $displayData .= \Pasteque\form_number("sell", $price, \i18n("Product.priceSell"), null, null, null, null, true);
 $displayData .= \Pasteque\form_number("priceBuy", $priceBuy, \i18n("Product.priceBuy"),"0.1");
 $displayData .= \Pasteque\form_number("margin", "", \i18n("Margin", PLUGIN_NAME), null, null, null, null, true);

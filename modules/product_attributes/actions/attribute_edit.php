@@ -31,10 +31,15 @@ if (isset($_POST['id'])) {
 	// edit values
 	$taxValues = array();
 	foreach ($_POST as $key => $value) {
-		if (strpos($key, "label-") === 0 && $key != "label-new") {
+		if (strpos($key, "value-") === 0 && $key != "value-new") {
 			$id = substr($key, 6);
 			$val = \Pasteque\AttributeValue::__build($id, $value);
-			\Pasteque\AttributesService::updateValue($val);
+			if ($value == "") {
+				\Pasteque\AttributesService::deleteValue($val->id);
+			}
+			else {
+				\Pasteque\AttributesService::updateValue($val);
+			}
 		}
 	}
 	if (isset($_POST['delete'])) {
@@ -43,17 +48,18 @@ if (isset($_POST['id'])) {
 		}
 	}
 	// new values?
-	foreach ($_POST['label-new'] as $newVal) {
+	foreach ($_POST['value-new'] as $newVal) {
 		if ($newVal !== null && $newVal !== "") {
 			$newValObj = new \Pasteque\AttributeValue($newVal);
+				echo "create: " . $newVal.  "<br>";
 			\Pasteque\AttributesService::createValue($newValObj, $_POST['id']);
 		}
 	}
-} else if (isset($_POST['label'])) {
+} else if (isset($_POST['value'])) {
 	// Create attribute
-	$attr = new \Pasteque\Attribute($_POST['label'], null);
+	$attr = new \Pasteque\Attribute($_POST['value'], null);
 	\Pasteque\AttributesService::createAttribute($attr);
-	foreach ($_POST['label-new'] as $newVal) {
+	foreach ($_POST['value-new'] as $newVal) {
 		if ($newVal !== null && $newVal !== "") {
 			$newValObj = new \Pasteque\AttributeValue($newVal);
 			\Pasteque\AttributesService::createValue($newValObj, $attr->id);
@@ -63,53 +69,29 @@ if (isset($_POST['id'])) {
 
 $attribute = null;
 if (isset($_GET['id'])) {
-    $attribute = \Pasteque\AttributesService::getAttribute($_GET['id']);
+	$attribute = \Pasteque\AttributesService::getAttribute($_GET['id']);
 }
+
+//Title
+echo \Pasteque\mainTitle(\i18n("Attribute",PLUGIN_NAME));
+//Informations
+\Pasteque\tpl_msg_box($message,$error);
+
+$content = \Pasteque\form_hidden("edit", $attribute, "id");
+$content .= \Pasteque\form_fieldset(\i18n("Attribute", PLUGIN_NAME), \Pasteque\form_input("edit", "Attribute", $attribute, "label", "string", array("required" => true)));
+$table[0][0] = \i18n("AttributeValue.value");
+$i = 1;
+if ($attribute !== null) {
+	foreach ($attribute->values as $value) {
+		$table[$i][0] = \Pasteque\form_input($value->id, "AttributeValue", $value, "value", "string", array("required" => false, "nolabel" => true, "nameid" => true));
+		$i++;
+	}
+}
+$table[$i][0] = \Pasteque\form_input("new", "AttributeValue", null, "value", "string", array("nolabel" => true, "nameid" => true, "array" => true));
+$content .= \Pasteque\standardTable($table);
+$content .= \Pasteque\form_save();
+echo \Pasteque\form_generate(\Pasteque\get_current_url(), "post", $content);
 ?>
-<h1><?php \pi18n("Edit attribute", PLUGIN_NAME); ?></h1>
-
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
-
-<!-- Attribute edit -->
-<form class="edit" action="<?php echo \Pasteque\get_current_url(); ?>" method="post">
-	<fieldset>
-		<legend><?php \pi18n("Attribute", PLUGIN_NAME); ?></legend>
-		<?php \Pasteque\form_hidden("edit", $attribute, "id"); ?>
-		<?php \Pasteque\form_input("edit", "Attribute", $attribute, "label", "string", array("required" => true)); ?>
-	</fieldset>
-	<table cellpadding="0" cellspacing="0">
-		<thead>
-			<tr>
-				<th><?php \pi18n("AttributeValue.value"); ?></th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody id="list">
-	<?php if ($attribute !== null) { foreach ($attribute->values as $value) { ?>
-		<tr id="line-<?php echo $value->id; ?>">
-			<td><?php \Pasteque\form_input($value->id, "AttributeValue", $value, "value", "string", array("required" => true, "nolabel" => true, "nameid" => true)); ?></td>
-			<td><?php \Pasteque\tpl_js_btn("", "del('" . $value->id . "');", "", "", "delete.png"); ?></td>
-		</tr>
-	<?php } } ?>
-	<?php for ($i = 0; $i < 5; $i++) { ?>
-		<tr>
-			<td><?php \Pasteque\form_input("new", "AttributeValue", null, "label", "string", array("nolabel" => true, "nameid" => true, "array" => true)); ?></td>
-			<td></td>
-		</tr>
-	<?php } ?>
-		</tbody>
-	</table>
-
-	<div class="row actions">
-		<?php \Pasteque\form_save(); ?>
-	</div>
-	
-</form>
-<?php if ($attribute !== null) { ?>
-<form action="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'attributes'); ?>" method="post">
-	<?php \Pasteque\form_delete("attribute", $attribute->id); ?>
-</form>
-<?php } ?>
 <script type="text/javascript">
 del = function(id) {
 	jQuery("#line-" + id).remove();

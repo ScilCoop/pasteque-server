@@ -21,24 +21,24 @@
 namespace Pasteque;
 
 function standardTable($content) {
-	$table = "<table class=\"table table-bordered table-hover\">";
-	$table .= "<thead>";
-	$table .= "<tr>";
+	$table = "<table class=\"table table-bordered table-hover\">\n";
+	$table .= "\t<thead>\n";
+	$table .= "\t\t<tr>\n";
 	for($j = 0; $j < sizeof($content[0]); $j++) {
-		$table .= sprintf("<th>%s</th>",$content[0][$j]);
+		$table .= sprintf("\t\t\t<th>\n\t\t\t%s\n\t\t\t</th>\n",$content[0][$j]);
 	}
-	$table .= "</tr>";
-	$table .= "</thead>";
-	$table .= "<tbody>";
+	$table .= "\t\t</tr>\n";
+	$table .= "\t</thead>\n";
+	$table .= "\t<tbody>\n";
 	for($i = 1; $i < sizeof($content); $i++) {
-		$table .= "<tr>";
+		$table .= "\t\t<tr>\n";
 		for($j = 0; $j < sizeof($content[$i]); $j++) {
-			$table .= sprintf("<td>%s</td>",$content[$i][$j]);
+			$table .= sprintf("\t\t\t<td>\n\t\t\t%s\n\t\t\t</td>\n",$content[$i][$j]);
 		}
-		$table .= "</tr>";
+		$table .= "\t\t</tr>\n";
 	}
-	$table .= "</tbody>";
-	$table .= "</table>";
+	$table .= "\t</tbody>\n";
+	$table .= "</table>\n";
 	return $table;
 }
 

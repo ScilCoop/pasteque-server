@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Products module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -28,13 +29,13 @@ $attributes = FALSE;
 $providers = FALSE;
 $modules = \Pasteque\get_loaded_modules(\Pasteque\get_user_id());
 if (in_array("product_discounts", $modules)) {
-    $discounts = TRUE;
+	$discounts = TRUE;
 }
 if (in_array("product_attributes", $modules)) {
-    $attributes = TRUE;
+	$attributes = TRUE;
 }
 if (in_array("product_providers", $modules)) {
-    $providers = TRUE;
+	$providers = TRUE;
 }
 
 $message = NULL;
@@ -122,11 +123,12 @@ $product = NULL;
 $vatprice = "";
 $price = "";
 if (isset($_GET['id'])) {
-    $product = \Pasteque\ProductsService::get($_GET['id']);
-    $taxCat = \Pasteque\TaxesService::get($product->taxCatId);
-    $tax = $taxCat->getCurrentTax();
-    $vatprice = $product->priceSell * (1 + $tax->rate);
-    $price = sprintf("%.2f", $product->priceSell);
+	$product = \Pasteque\ProductsService::get($_GET['id']);
+	$taxCat = \Pasteque\TaxesService::get($product->taxCatId);
+	$tax = $taxCat->getCurrentTax();
+	$vatprice = $product->priceSell * (1 + $tax->rate);
+	$price = sprintf("%.2f", $product->priceSell);
+	$priceBuy = sprintf("%.2f",$product->priceBuy);
 }
 $taxes = \Pasteque\TaxesService::getAll();
 $categories = \Pasteque\CategoriesService::getAll();
@@ -134,7 +136,7 @@ $providers = \Pasteque\ProvidersService::getAll();
 
 $level = NULL;
 if ($stocks === TRUE && $product != NULL) {
-    $level = \Pasteque\StocksService::getLevel($product->id);
+	$level = \Pasteque\StocksService::getLevel($product->id);
 }
 
 //Title
@@ -143,75 +145,56 @@ echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Edit a product", PLUGIN_NAME)));
 \Pasteque\tpl_msg_box($message, $error);
 
 $form = \Pasteque\form_hidden("edit", $product, "id");
+
+// Display data
 $legend = \i18n("Display", PLUGIN_NAME);
 $displayData = "\t".\Pasteque\form_input("edit", "Product", $product, "label", "string", array("required" => true));
 $displayData .= "\t".\Pasteque\form_input("edit", "Product", $product, "categoryId", "pick", array("model" => "Category"));
 if($providers) {
 	$displayData .= \Pasteque\form_input("edit", "Product", $product, "providerId", "pick", array("model" => "Provider"));
 }
-$form .= \Pasteque\form_fieldset($legend,$displayData);
-?>
-    <div class="row">
-        <label for="image"><?php \pi18n("Image"); ?></label>
-        <div style="display:inline-block">
-            <input type="hidden" id="clearImage" name="clearImage" value="0" />
-        <?php if ($product !== null && $product->hasImage === true) { ?>
-            <img id="img" class="image-preview" src="?<?php echo \Pasteque\PT::URL_ACTION_PARAM; ?>=img&w=product&id=<?php echo $product->id; ?>" />
-            <a class="btn" id="clear" href="" onClick="javascript:clearImage(); return false;"><?php \pi18n("Delete"); ?></a>
-            <a class="btn" style="display:none" id="restore" href="" onClick="javascript:restoreImage(); return false;"><?php \pi18n("Restore"); ?></a><br />
-        <?php } ?>
-            <input id="image" type="file" name="image" />
-        </div>
-    </div>
-    <?php
 $displayData .= \Pasteque\form_input("edit", "Product", $product, "visible", "boolean");
+$form .= \Pasteque\form_fieldset($legend,$displayData);
 
+// Image
+$legend = \i18n("Image");
+$displayData = \Pasteque\row(\Pasteque\form_file("image","image",\i18n("Image", PLUGIN_NAME)));
+$form .= \Pasteque\form_value_hidden("clearImage", "clearImage", "0");
+if ($product !== null && $product->hasImage === true) {
+	$displayData .= \Pasteque\row("<img id=\"img\" class=\"image-preview\" src=\"?" . \Pasteque\PT::URL_ACTION_PARAM . "=img&w=product&id=" . $product->id . "\">");
+	$buttons .= \Pasteque\jsDeleteButton(\i18n("Delete"), "javascript:clearImage();");
+	$buttons .= \Pasteque\jsAddButton(\i18n("Restore"), "javascript:restoreImage();");
+	$displayData .= \Pasteque\buttonGroup($buttons);
+}
+$form .= \Pasteque\form_fieldset($legend,$displayData);
+
+// Pricing
 $legend = \i18n("Price", PLUGIN_NAME);
-$displayData = \Pasteque\form_input("edit", "Product", $product, "scaled", "boolean", array("default" => FALSE));
+$displayData = \Pasteque\form_value_hidden("realsell","realsell",$product->priceSell);
+$displayData .= \Pasteque\form_input("edit", "Product", $product, "scaled", "boolean", array("default" => FALSE));
 $displayData .= \Pasteque\form_input("edit", "Product", $product, "taxCatId", "pick", array("model" => "TaxCategory"));
-//$displayData .= \Pasteque\form_input("edit", "Product", $product, "vatprice", "numeric", array());
-?>
-        <label for="sellvat"><?php \pi18n("Sell price + taxes", PLUGIN_NAME); ?></label>
-        <input id="sellvat" type="numeric" name="selltax" value="<?php echo $vatprice; ?>" />
-    </div>
-    <div class="row">
-        <label for="sell"><?php \pi18n("Product.priceSell"); ?></label>
-        <input type="hidden" id="realsell" name="realsell" <?php if ($product != NULL) echo 'value="' . $product->priceSell. '"'; ?> />
-        <input id="sell" type="numeric" name="sell" value="<?php echo $price; ?>" readonly="true" />
-    </div>
-    <?php 
-$displayData .= \Pasteque\form_input("edit", "Product", $product, "priceBuy", "numeric"); ?>
-    <div class="row">
-        <label for="margin"><?php \pi18n("Margin", PLUGIN_NAME); ?></label>
-        <input id="margin" type="numeric" disabled="true" />
-    </div>
-<?php
+$displayData .= \Pasteque\form_number("sellvat",$vatprice,\i18n("Sell price + taxes", PLUGIN_NAME),"0.01",0);
+$displayData .= \Pasteque\form_number("sell",$price,\i18n("Product.priceSell"),null,0,null,null,true);
+$displayData .= \Pasteque\form_number("priceBuy", $priceBuy, \i18n("Product.priceBuy"),"0.1");
+$displayData .= \Pasteque\form_number("margin", "",\i18n("Margin"),null,0,null,null,true);
 if ($discounts) {
 	$displayData .= \Pasteque\form_input("edit", "Product", $product, "discountEnabled", "boolean", array("default" => FALSE));
 	$displayData .= \Pasteque\form_input("edit", "Product", $product, "discountRate", "numeric");
 }
-
 $form .= \Pasteque\form_fieldset($legend,$displayData);
 
-?>
-    </fieldset>
-    <fieldset>
-    <legend><?php \pi18n("Referencing", PLUGIN_NAME); ?></legend>
-    <?php \Pasteque\form_input("edit", "Product", $product, "reference", "string", array("required" => true)); ?>
-    <div class="row">
-        <label for="barcode"><?php \pi18n("Product.barcode"); ?></label>
-        <div style="display:inline-block; max-width:65%;">
-            <img id="barcodeImg" src="" />
-            <input id="barcode" type="text" name="barcode" <?php if ($product != NULL) echo 'value="' . $product->barcode . '"'; ?> />
-            <a class="btn" href="" onClick="javascript:generateBarcode(); return false;"><?php \pi18n("Generate"); ?></a>
-        </div>
-    </div>
-    <?php if ($attributes) { ?>
-    <?php \Pasteque\form_input("edit", "Product", $product, "attributeSetId", "pick", array("model" => "AttributeSet", "nullable" => true)); ?>
-    <?php } ?>
-    </fieldset>
+// Referencing
+$legend = \i18n("Referencing", PLUGIN_NAME);
+$displayData = \Pasteque\form_input("edit", "Product", $product, "reference", "string", array("required" => true));
+$displayData .= \Pasteque\form_text("barcode",$product->barcode,\i18n("Product.barcode"));
+$displayData .= "<img src=\"\" id=\"barcodeImg\">\n";
+$displayData .= \Pasteque\jsAddButton(\i18n("Generate"),"javascript:generateBarcode(); return false;");
+if ($attributes) {
+	$displayData .= \Pasteque\form_input("edit", "Product", $product, "attributeSetId", "pick", array("model" => "AttributeSet", "nullable" => true));
+}
+$form .= \Pasteque\form_fieldset($legend,$displayData);
 
-<?php
+// That's all folks
 $form .= \Pasteque\form_save();
 echo \Pasteque\form_generate(\Pasteque\get_current_url(),"post",$form);
 
@@ -243,7 +226,7 @@ updateSellVatPrice = function() {
 }
 updateMargin = function() {
 	var sell = jQuery("#realsell").val();
-	var buy = jQuery("#edit-priceBuy").val();
+	var buy = jQuery("#priceBuy").val();
 	var ratio = sell / buy - 1;
 	var margin = (ratio * 100).toFixed(2) + "%";
 	var rate = (sell / buy).toFixed(2);
@@ -266,7 +249,7 @@ jQuery("#sell").change(function() {
 		jQuery(this).val(val);
 		updateSellVatPrice()
 		});
-jQuery("#edit-priceBuy").change(function() {
+jQuery("#priceBuy").change(function() {
 		var val = jQuery(this).val().replace(",", ".");
 		jQuery(this).val(val);
 		updateMargin()
