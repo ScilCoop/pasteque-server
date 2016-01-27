@@ -141,9 +141,36 @@ function form_file($id, $name="file", $label=null, $class=null) {
 	$ret .= "\t</div>\n";
 	$ret .= "</div>\n";
 	return $ret;
-
 }
 
+function form_checkbox($id, $checked=false, $label=null, $class=null) {
+	$ret = "<div class=\"form-group row\">\n";
+	if($label !== null) {
+		$ret .= "\t<label for=\"". $id ."\" class=\"col-sm-2 control-label\">" . $label . "</label>\n";
+	}
+	$ret .= "\t<div class=\"col-sm-10\">\n";
+	$ret .= "\t\t<input id=\"" . $id . "\" type=\"checkbox\" name=\"" . $id . "\" checked=\"" . $checked . "\">\n";
+	$ret .= "\t</div>\n";
+	$ret .= "</div>\n";
+	return $ret;
+}
+
+function form_textarea($id, $value="", $label=null, $class=null) {
+	$ret = "<div class=\"form-group row\">\n";
+	if($label !== null) {
+		$ret = "\t<label for=\"". $id ."\" class=\"col-sm-2 control-label\">" . $label . "</label>\n";
+	}
+	$ret .= "\t<div class=\"col-sm-10";
+	if ($class !== null) {
+		$ret .= " " . $class;
+	}
+	$ret .= "\">\n";
+	$ret .= "\t\t<textarea class=\"form-control\" id=\"" . $id . "\" name=\"" . $id . "\">";
+	$ret .= $value . "</textarea>\n";
+	$ret .= "\t</div>\n";
+	$ret .= "</div>\n";
+	return $ret;
+}
 function form_input($form_id, $class, $object, $field, $type, $args = array()) {
 	$ret = "";
 	if (!isset($args['nolabel']) || $args['nolabel'] === false) {

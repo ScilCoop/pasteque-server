@@ -126,7 +126,7 @@ echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Modules", PLUGIN_NAME)));
 \Pasteque\tpl_msg_box($message, $error);
 
 //Free modules section
-echo \Pasteque\row(\Pasteque\secondaryTitle(\i18n("Free modules", PLUGIN_NAME)));
+//echo \Pasteque\row(\Pasteque\secondaryTitle(\i18n("Free modules", PLUGIN_NAME)));
 echo \Pasteque\row(\Pasteque\infoDiv(\i18n("Once modules are selected, they will be activated in a short moment.", PLUGIN_NAME)));
 ?>
 <form class="edit" action="<?php echo \Pasteque\get_current_url(); ?>" method="post">

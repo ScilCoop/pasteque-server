@@ -37,8 +37,7 @@ $cashRegs = $srv->getAll();
 //Title
 echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Cash registers", PLUGIN_NAME)));
 //Buttons
-$buttons = \Pasteque\tpl_btn('btn', \Pasteque\get_module_url_action(PLUGIN_NAME, "cashregister_edit"),
-        \i18n('New cash register', PLUGIN_NAME), 'img/btn_add.png');
+$buttons = \Pasteque\addbutton(\i18n("New cash register", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME,"cashregister_edit"));
 echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
 //Information
 \Pasteque\tpl_msg_box($message, $error);
