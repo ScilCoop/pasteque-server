@@ -45,7 +45,7 @@ else {
 	$i = 1;
 	foreach ($resources as $res) {
 		$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'resource_edit', array("id" => $res->id)));
-		$btn_group .= \Pasteque\deleteButton(\i18n('Delete', PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-resource=" . $res->id);
+		$btn_group .= \Pasteque\deleteButton(\i18n('Delete', PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-res=" . $res->id);
 		$content[$i][0] = $res->label;
 		$content[$i][0] .= \Pasteque\buttonGroup($btn_group, "pull-right");
 		$i++;
