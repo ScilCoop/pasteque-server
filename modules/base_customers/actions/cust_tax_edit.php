@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Users module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Cédric Houbart, Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
@@ -23,49 +24,42 @@ namespace BaseCustomers;
 $message = NULL;
 $error = NULL;
 if (isset($_POST['id']) && isset($_POST['label'])) {
-    $tax_cat_id = NULL;
-    if ($_POST['taxCatId'] !== "") {
-        $tax_cat_id = $_POST['taxCatId'];
-    }
-    $custTax = \Pasteque\CustTaxCat::__build($_POST['id'], $_POST['label'], $tax_cat_id);
-    if (\Pasteque\CustTaxCatsService::update($custTax)) {
-        $message = \i18n("Changes saved");
-    } else {
-        $error = \i18n("Unable to save changes");
-    }
+	$tax_cat_id = NULL;
+	if ($_POST['taxCatId'] !== "") {
+		$tax_cat_id = $_POST['taxCatId'];
+	}
+	$custTax = \Pasteque\CustTaxCat::__build($_POST['id'], $_POST['label'], $tax_cat_id);
+	if (\Pasteque\CustTaxCatsService::update($custTax)) {
+		$message = \i18n("Changes saved");
+	} else {
+		$error = \i18n("Unable to save changes");
+	}
 } else if (isset($_POST['label'])) {
-    $tax_cat_id = NULL;
-    if ($_POST['taxCatId'] !== "") {
-        $tax_cat_id = $_POST['taxCatId'];
-    }
-    $custTax = new \Pasteque\CustTaxCat($_POST['label'], $tax_cat_id);
-    $id = \Pasteque\CustTaxCatsService::create($custTax);
-    if ($id !== FALSE) {
-        $message = \i18n("Tax saved. <a href=\"%s\">Go to the tax page</a>.", PLUGIN_NAME, \Pasteque\get_module_url_action(PLUGIN_NAME, 'cust_tax_edit', array('id' => $id)));
-    } else {
-        $error = \i18n("Unable to save changes");
-    }
+	$tax_cat_id = NULL;
+	if ($_POST['taxCatId'] !== "") {
+		$tax_cat_id = $_POST['taxCatId'];
+	}
+	$custTax = new \Pasteque\CustTaxCat($_POST['label'], $tax_cat_id);
+	$id = \Pasteque\CustTaxCatsService::create($custTax);
+	if ($id !== FALSE) {
+		$message = \i18n("Tax saved. <a href=\"%s\">Go to the tax page</a>.", PLUGIN_NAME, \Pasteque\get_module_url_action(PLUGIN_NAME, 'cust_tax_edit', array('id' => $id)));
+	} else {
+		$error = \i18n("Unable to save changes");
+	}
 }
 
 $custTax = NULL;
 if (isset($_GET['id'])) {
-    $custTax = \Pasteque\CustTaxCatsService::get($_GET['id']);
+	$custTax = \Pasteque\CustTaxCatsService::get($_GET['id']);
 }
-?>
-<h1><?php \pi18n("Edit a customer tax", PLUGIN_NAME); ?></h1>
 
-<?php \Pasteque\tpl_msg_box($message, $error); ?>
+//Title
+echo \Pasteque\mainTitle(\i18n("Edit a customer tax", PLUGIN_NAME));
+//Information
+\Pasteque\tpl_msg_box($message,$error);
 
-<form class="edit" action="<?php echo \Pasteque\get_current_url(); ?>" method="post">
-	<?php \Pasteque\form_hidden("edit", $custTax, "id"); ?>
-	<?php \Pasteque\form_input("edit", "CustTaxCat", $custTax, "label", "string", array("required" => true)); ?>
-	<?php \Pasteque\form_input("edit", "CustTaxCat", $custTax, "taxCatId", "pick", array("model" => "Tax", "nullable" => true)); ?>
-	<div class="row actions">
-		<?php \Pasteque\form_save(); ?>
-	</div>
-</form>
-<?php if ($custTax !== NULL) { ?>
-<form action="<?php echo \Pasteque\get_module_url_action(PLUGIN_NAME, 'cust_taxes'); ?>" method="post">
-	<?php \Pasteque\form_delete("custtax", $custTax->id); ?>
-</form>
-<?php } ?>
+$content .= \Pasteque\form_hidden("edit", $custTax, "id");
+$content .= \Pasteque\form_input("edit", "CustTaxCat", $custTax, "label", "string", array("required" => true));
+$content .= \Pasteque\form_input("edit", "CustTaxCat", $custTax, "taxCatId", "pick", array("model" => "Tax", "nullable" => true));
+$content .= \Pasteque\form_save();
+echo \Pasteque\form_generate(\Pasteque\get_current_url(),"post",$content);

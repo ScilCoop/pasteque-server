@@ -104,7 +104,7 @@ function form_number($id, $value=null, $label=null, $step=null, $min=null, $max=
 	return $ret;
 }
 
-function form_date($id, $value, $label=null, $format=null, $class=null) {
+function form_date($id, $value, $label=null, $format=null, $class=null, $readonly=false) {
 	$ret = "<div class=\"form-group row\">\n";
 	if($label !== null) {
 		$ret = "\t<label for=\"". $id ."\" class=\"col-sm-2 control-label\">" . $label . "</label>\n";
@@ -115,6 +115,9 @@ function form_date($id, $value, $label=null, $format=null, $class=null) {
 	}
 	else {
 		$ret .= "yyyy-mm-dd";
+	}
+	if($readonly !== false) {
+		$ret .= " readonly=\"true\"";
 	}
 	$ret .= "\" class=\"col-sm-10 input-group date";
 	if($class !== null) {

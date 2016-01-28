@@ -2,7 +2,7 @@
 //    Pastèque Web back office, Products module
 //
 //    Copyright (C) 2013-2016 Scil (http://scil.coop)
-//        Philippe Pary philippe@scil.coop
+//        Cédric Houbart, Philippe Pary philippe@scil.coop
 //
 //    This file is part of Pastèque.
 //
