@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office, Users module
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013-2016 Scil (http://scil.coop)
+//        Cédric Houbart, Philippe Pary
 //
 //    This file is part of Pastèque.
 //
@@ -20,24 +21,22 @@
 
 namespace BaseRestaurant;
 
-$sql = "SELECT TICKETS.CUSTCOUNT, "
-        . "MIN(RECEIPTS.DATENEW) AS STARTDATE, "
-        . "MAX(RECEIPTS.DATENEW) AS ENDDATE, COUNT(TICKETS.TICKETID) AS COUNT, "
-        . "(COUNT(TICKETS.TICKETID) / TICKETS.CUSTCOUNT) AS TABLES ,"
-        . "AVG(TAXLINES.BASE) AS AVGSUBPRICE, "
-        . "AVG(TAXLINES.BASE + TAXLINES.AMOUNT) AS AVGPRICE "
+$sql = "SELECT TICKETS.CUSTCOUNT, " // nb cust / table
+        . "COUNT(TICKETS.TICKETID) AS COUNT, " // nb tickets
+        . "AVG(TAXLINES.BASE) AS AVGSUBPRICE, " // avg subprice
+        . "AVG(TAXLINES.BASE + TAXLINES.AMOUNT) AS AVGPRICE " // agv vatprice
         . "FROM TICKETS, RECEIPTS, TAXLINES WHERE RECEIPTS.ID = TICKETS.ID "
         . "AND RECEIPTS.ID = TAXLINES.RECEIPT "
         . "AND RECEIPTS.DATENEW > :start "
         . "AND RECEIPTS.DATENEW < :stop "
+        . "AND TICKETS.CUSTCOUNT IS NOT NULL "
         . "GROUP BY TICKETS.CUSTCOUNT "
         . "ORDER BY TICKETS.CUSTCOUNT";
 
-$fields = array("CUSTCOUNT", "STARTDATE", "ENDDATE", "COUNT", "TABLES",
+$fields = array("CUSTCOUNT", "COUNT",
         "AVGSUBPRICE", "AVGPRICE");
 $headers = array(\i18n("Custcount", PLUGIN_NAME),
-        \i18n("Session.openDate"), \i18n("Session.closeDate"),
-        \i18n("Number", PLUGIN_NAME), \i18n("Tables", PLUGIN_NAME),
+        \i18n("Number of tickets", PLUGIN_NAME),
         \i18n("Average price w/o tax", PLUGIN_NAME),
         \i18n("Average price", PLUGIN_NAME)
         );
@@ -51,22 +50,14 @@ $report->setDefaultInput("start", time() - (time() % 86400) - 7 * 86400);
 $report->addInput("stop", \i18n("Session.closeDate"), \Pasteque\DB::DATE);
 $report->setDefaultinput("stop", time() - (time() % 86400) + 86400);
 
-$report->addFilter("DATESTART", "\Pasteque\stdtimefstr");
-$report->addFilter("DATESTART", "\i18nDatetime");
-$report->addFilter("DATEEND", "\Pasteque\stdtimefstr");
-$report->addFilter("DATEEND", "\i18nDatetime");
 $report->setVisualFilter("AVGSUBPRICE", "\i18nCurr", \Pasteque\Report::DISP_USER);
 $report->setVisualFilter("AVGSUBPRICE", "\i18nFlt", \Pasteque\Report::DISP_CSV);
 $report->setVisualFilter("AVGPRICE", "\i18nCurr", \Pasteque\Report::DISP_USER);
 $report->setVisualFilter("AVGPRICE", "\i18nFlt", \Pasteque\Report::DISP_CSV);
-$report->setVisualFilter("TABLES", "\i18nInt", \Pasteque\Report::DISP_CSV | \Pasteque\Report::DISP_USER);
 
-$report->addTotal("TABLES", \Pasteque\Report::TOTAL_SUM);
 // sum of count / sum of tables
-$report->addTotal("CUSTCOUNT", \Pasteque\Report::TOTAL_SUM);
-$report->addTotal("CUSTCOUNT", \Pasteque\Report::TOTAL_AVG);
-$report->addPonderate("CUSTCOUNT", "TABLES"); // COUNT = SUM(TABLE * CUSTCOUNT)
-
+$report->addTotal("COUNT", \Pasteque\Report::TOTAL_SUM);
+$report->addPonderate("CUSTCOUNT", "TABLES"); // COUNT = SUM(TABLE * CUSTCOUNT)
 $report->addTotal("AVGSUBPRICE", \Pasteque\Report::TOTAL_AVG);
 $report->addTotal("AVGPRICE", \Pasteque\Report::TOTAL_AVG);
 
