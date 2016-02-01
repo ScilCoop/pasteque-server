@@ -1,7 +1,8 @@
 <?php
 //    Pastèque Web back office
 //
-//    Copyright (C) 2013 Scil (http://scil.coop)
+//    Copyright (C) 2013, 2016 Scil (http://scil.coop)
+//          Cédric Houbart
 //
 //    This file is part of Pastèque.
 //
@@ -75,8 +76,11 @@ function report_csv($module, $name, $values) {
 
 
 function init_data($report, $data, $line, $field) {
-     $field = strtoupper($field);
-     if (isset($line[$field])) {
+     $upField = strtoupper($field);
+     if (isset($line[$upField])) {
+         $data[] = $report->applyVisualFilter($upField, $line, Report::DISP_CSV);
+     }
+     else if (isset($line[$field])) {
          $data[] = $report->applyVisualFilter($field, $line, Report::DISP_CSV);
      } else {
          $data[] = "";
