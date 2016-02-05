@@ -61,6 +61,7 @@ else {
 		$btn_group = \Pasteque\editButton(\i18n('Edit', PLUGIN_NAME), \Pasteque\get_module_url_action(PLUGIN_NAME, 'currency_edit', array("id" => $currency->id)));
 		$btn_group .= \Pasteque\deleteButton(\i18n('Delete', PLUGIN_NAME), \Pasteque\get_current_url() . "&delete-currency=" . $tax->id);
 		$content[$i][1] .= \Pasteque\buttonGroup($btn_group, "pull-right");
+		$i++;
 	}
 	echo \Pasteque\row(\Pasteque\standardTable($content));
 }
