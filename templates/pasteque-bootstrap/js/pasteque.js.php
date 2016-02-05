@@ -35,6 +35,9 @@ $dateFormat = i18n("date");
 $jsDateFormat = str_replace(array("%Y", "%m", "%d"),
         array("yyyy", "mm", "dd"),$dateFormat);
 ?>
+$(document).ready(function() {
+	$("table").tablesorter();
+});
 $(function() {
 	$(".date").datepicker({ dateFormat: "<?php echo $jsDateFormat; ?>" });
 });
