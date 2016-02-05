@@ -41,6 +41,7 @@ echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Categories", PLUGIN_NAME)));
 //Buttons
 $buttons = \Pasteque\addButton(\i18n('Add a category', PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "category_edit"));
 $buttons .= \Pasteque\importButton(\i18n('Import categories', PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "categoriesManagement"));
+$buttons .= \Pasteque\exportButton(\i18n("Export categories", PLUGIN_NAME),\Pasteque\get_report_url(PLUGIN_NAME,"categories_export"));
 echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
 //Information
 \Pasteque\tpl_msg_box($message, $error); 

@@ -88,7 +88,7 @@ echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Products", PLUGIN_NAME)));
 //Buttons
 $buttons = \Pasteque\addButton(\i18n("Add a product", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "product_edit"));
 $buttons .= \Pasteque\importButton(\i18n("Import products", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "productsManagement"));
-$buttons .= \Pasteque\exportButton(\i18n("Export products", PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME,"products_export"));
+$buttons .= \Pasteque\exportButton(\i18n("Export products", PLUGIN_NAME),\Pasteque\get_report_url(PLUGIN_NAME,"products_export"));
 echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
 //Information
 \Pasteque\tpl_msg_box($message, $error);
