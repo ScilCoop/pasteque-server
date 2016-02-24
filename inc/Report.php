@@ -20,6 +20,8 @@
 
 namespace Pasteque;
 
+/** Interface for all reports. Every report is bound to a
+ * ReportRunInterface for the execution. */
 interface ReportInterface {
     /** Run the report and return a ReportRunInterface instance.
      * @param $values associative array of input => value.
@@ -44,6 +46,9 @@ interface ReportInterface {
     public function getId();
 }
 
+/** Interface for executing reports and retrieving the results.
+ * Get a run by calling ReportInterface->run then fetch values line by
+ * line by calling fetch on the instance. */
 interface ReportRunInterface {
     /** Fetch a line of data and return them as an associative array
      * field => value. Returns false when finished.
@@ -57,15 +62,21 @@ interface ReportRunInterface {
     public function isGroupEnd();
     /** Get the name of current group. */
     public function getCurrentGroup();
-    /** Get subtotal values in an associative array field => value. */
+    /** Get subtotal values in an associative array field => value
+     * of the last group that ended (not current group). */
     public function getSubtotals();
-    /** Get total values in an associative array field => value. */
+    /** Get total values in an associative array field => value
+     * of the last group that ended (not current group). */
     public function getTotals();
 }
 
+/** Simple report with only one sql query. */
 class Report implements ReportInterface {
 
+    /** Total constant type for summing all values in the total. */
     const TOTAL_SUM = "sum";
+    /** Total constant type for putting the average of all values in
+     * the total. */
     const TOTAL_AVG = "average";
     /** Display destination for end-user */
     const DISP_USER = 1;
@@ -94,6 +105,16 @@ class Report implements ReportInterface {
     protected $subtotals; //array
     protected $totals; //array
 
+    /** Set a basic Report that can be configured more finely with
+     * add* and set* methods.
+     * @param $domain Report domain (generaly module name).
+     * @param $id Report id in its domain.
+     * @param $title Report title key for translation and display.
+     * @param $sql The sql request of the report with PDO placeholders.
+     * @param $headers Array of titles of each columns in the same order
+     * as $fields for translation and display.
+     * @param $fields Array of columns of the sql request to be used,
+     * also defines the display order. */
     public function __construct($domain, $id, $title, $sql, $headers, $fields) {
         $this->domain = $domain;
         $this->id = $id;
@@ -131,16 +152,26 @@ class Report implements ReportInterface {
         return $this->fields;
     }
 
+    /** Add an input field for the user to limit the output
+     * of the Report.
+     * @param $param The PDO placeholder bound to this input,
+     * without the ':' prefix.
+     * @param $label Input title for display.
+     * @param $type Input type constant, see DB constants. */
     public function addInput($param, $label, $type) {
         $this->params[] = array("param" => $param, "label" => $label,
                 "type" => $type);
     }
 
+    /** Add an hidden input field that cannot be changed by the user. */
     public function addHiddenInput($param, $label, $type) {
         $this->params[] = array("param" => $param, "label" => $label,
                 "type" => $type);
     }
 
+    /** Set the default value of an input field.
+     * @param $param Input name (same as $param in addInput).
+     * @param $value The default value. */
     public function setDefaultInput($param, $value) {
         foreach ($this->params as $i => $defParam) {
             if ($defParam['param'] == $param) {
@@ -175,13 +206,21 @@ class Report implements ReportInterface {
         return $this->sql;
     }
 
+    /** Add a filter to a field to manipulate the value retrieved from
+     * the database. Filters are executed just after execution,
+     * the basic value before filtering cannot be accessed.
+     * @param $field The field name as set in $fields
+     * from the constructor.
+     * @param $function The filtering function which takes the database
+     * value in parameter and returns the transformed value. */
     public function addFilter($field, $function) {
         if (!isset($this->filters[$field])) {
             $this->filters[$field] = array();
         }
         $this->filters[$field][] = $function;
     }
-    /** Set visual filter for given output (default DISP_USER) */
+    /** Set visual filter for given output (default DISP_USER).
+     * Visual filters are to be executed on output. */
     public function setVisualFilter($field, $function,
             $output = Report::DISP_USER) {
         if (($output & Report::DISP_USER) > 0) {
@@ -196,6 +235,10 @@ class Report implements ReportInterface {
         return $this->filters;
     }
 
+    /** Set the grouping field name as defined in $fields from
+     * the constructor to request to broke the result in
+     * multiple groups. This has nothing to do with GROUP BY in request,
+     * only for displaying the results. */
     public function setGrouping($field) {
         $this->grouping = $field;
     }
@@ -206,6 +249,9 @@ class Report implements ReportInterface {
         return $this->grouping;
     }
 
+    /** Add a subtotal for a field. See Report TOTAL_* constants.
+     * Subtotals are used only with a grouping field set
+     * with setGrouping. */
     public function addSubtotal($field, $type) {
         if ($type === NULL && isset($this->subtotals[$field])) {
             unset($this->subtotals[$field]);
@@ -221,6 +267,7 @@ class Report implements ReportInterface {
         return count($this->subtotals) > 0;
     }
 
+    /** Add a total for a field. See Report TOTAL_* constants. */
     public function addTotal($field, $type) {
         if ($type === NULL && isset($this->totals[$field])) {
             unset($this->totals[$field]);
@@ -281,27 +328,38 @@ class Report implements ReportInterface {
 
 }
 
+/** Data for a Report when executed. Get an instance by calling
+ * run on a Report instance. */
 class ReportRun implements ReportRunInterface {
 
     protected $report;
     protected $values;
     public $subtotals;
     public $totals;
+    /** Subtotal values from the current row. It will be transformed
+     * into $subtotals when all values of the group are fetched. */
     protected $tmpSubtotals;
+    /** Total values from the current row. It will be transformed
+     * into $totals when all values of the group are fetched. */
     protected $tmpTotals;
     protected $groupRowCount;
     protected $totalRowCount;
     protected $currentGroup;
     protected $groupStart;
     protected $groupStop;
+    /** Boolean, true when the request has no result. */
     protected $empty;
     protected $pnd;
 
+    /** Create a run from a Report. Don't create ReportRun by hand,
+     * use Report->run instead. */
     public function __construct($report, $values) {
         $this->report = $report;
         $this->values = $values;
         $pdo = PDOBuilder::getPDO();
         $this->stmt = $pdo->prepare($report->getSql());
+        // Bind values to the sql request, either given by parameter
+        // or the Report default value.
         foreach ($report->getParams() as $param) {
             $id = $param["param"];
             $val = null;
@@ -325,6 +383,7 @@ class ReportRun implements ReportRunInterface {
                 break;
             }
         }
+        // Initialize output values
         $this->groupRowCount = 0;
         $this->totalRowCount = 0;
         $this->resetTmpSubtotals();
@@ -335,18 +394,19 @@ class ReportRun implements ReportRunInterface {
             $this->tmpTotals[$field] = 0;
         }
         $this->currentGroup = NULL;
+        $this->pnd = array();
+        foreach (array_keys($this->report->getTotals()) as $field) {
+            $this->pnd[$field] = 0;
+        }
+        // Execute the query
         $this->stmt->execute();
         // Check for results
         if (!$this->stmt->fetch()) {
             $this->empty = TRUE;
         }
         $this->stmt->closeCursor();
+        // Restart query not to skip the first row
         $this->stmt->execute();
-
-        $this->pnd = array();
-        foreach (array_keys($this->report->getTotals()) as $field) {
-            $this->pnd[$field] = 0;
-        }
     }
 
     public function isEmpty() {
@@ -385,6 +445,8 @@ class ReportRun implements ReportRunInterface {
         return $dest;
     }
 
+    /** Apply report filters to a row of values and return the new
+     * row values. */
     protected function applyFilters($values) {
         if (!is_array($values)) {
             return $values;
@@ -404,9 +466,12 @@ class ReportRun implements ReportRunInterface {
         return $ret;
     }
 
+    /** Fetch a row of data from the sql query. */
     protected function fetchValues() {
         return $this->stmt->fetch(\PDO::FETCH_ASSOC);
     }
+    /** Compute tmp total and subtotals from the given values, check for
+     * group change and set total and subtotal in case of group switch. */
     protected function parseValues($values) {
         // Check for group change
         if ($this->report->isGrouping() && $values !== FALSE) {
@@ -462,12 +527,11 @@ class ReportRun implements ReportRunInterface {
             $this->totals = $this->applyFilters($this->totals);
             $this->groupStop = TRUE;
         }
-        return $values;
     }
 
     public function fetch() {
         $values = $this->fetchValues();
-        $values = $this->parseValues($values);
+        $this->parseValues($values);
         return $this->applyFilters($values);
     }
 
@@ -493,8 +557,19 @@ class ReportRun implements ReportRunInterface {
 }
 
 /** Cross-report. A merged report is made of a main report wich is completed by
- * subreports. Subreports adds columns to the first based on merge fields.
- * Subreports has (merge fields count + 2) fields, the field name and its value.
+ * subreports (subqueries) linked by merging fields. A merged report
+ * has a varying number of columns depending on the subqueries values.
+ *
+ * The subqueries has two columns named __KEY__ and __VALUE__ plus the
+ * merging fields which must be grouped by. Every row with the matching
+ * values in the merging fields will be added as column in the main
+ * report row.
+ *
+ * Let's say the main query gets cash session ID (CID) and total taxes.
+ * We want to add the details of taxes by types (which are not limited).
+ * The subquery gets the cash session ID (grouped by it), the tax type
+ * as __KEY__ and the tax amount as __VALUE__. The merged report will
+ * show CID, total taxes and total of each types of tax for this CID.
  */
 class MergedReport extends Report {
 
@@ -506,6 +581,22 @@ class MergedReport extends Report {
     private $mergedHeaderFilters;
     protected $mergedVisualFilters;
 
+    /** Set a basic MergedReport that can be configured more finely with
+     * add* and set* methods.
+     * @param $domain Report domain (generaly module name).
+     * @param $id Report id in its domain.
+     * @param $title Report title key for translation and display.
+     * @param $sqls The array of sql request of the report
+     * with PDO placeholders. The first one is the main query, the next
+     * ones are subqueries.
+     * @param $headers Array of titles of each columns in the same order
+     * as $fields for translation and display (merged columns cannot be
+     * named explicitely because they are dynamic).
+     * @param $fields Array of columns of the sql request to be used,
+     * also defines the display order (merged columns are sort in the
+     * same order as the results of the subquery).
+     * @param $mergeFields Array of columns of the main sql request that
+     * are used to link the main query to the subqueries. */
     public function __construct($domain, $id, $title, $sqls, $headers, $fields,
             $mergeFields) {
         parent::__construct($domain, $id, $title, $sqls[0], $headers, $fields);
@@ -529,6 +620,10 @@ class MergedReport extends Report {
     public function getMergeFields() {
         return $this->mergeFields;
     }
+
+    /** Add a column to the result when discovered in a subquery. Do not
+     * call it by hand, it is called by the report run to setup the
+     * final array of fields. */
     public function addMergedField($sqlIndex, $field) {
         if (!in_array($field, $this->fields)) {
             $this->fields[] = $field;
@@ -560,14 +655,24 @@ class MergedReport extends Report {
         }
     }
 
+    /** Add a total to all columns discovered in a subquery.
+     * @param $sqlIndex Index of subquery.
+     * @param $type Total type (see Report TYPE_* constants). */
     public function addMergedTotal($sqlIndex, $type) {
         $this->mergedTotals[$sqlIndex] = $type;
     }
 
+    /** Add a subtotal to all columns discovered in a subquery.
+     * @param $sqlIndex Index of subquery.
+     * @param $type Total type (see Report TYPE_* constants). */
     public function addMergedSubtotal($sqlIndex, $type) {
         $this->mergedSubtotals[$sqlIndex] = $type;
     }
 
+    /** Add a filter to modify the title of columns added by a subquery.
+     * @param $sqlIndex Index of subquery.
+     * @param $function Filter function which takes the __KEY__ value
+     * and returns the filtered value. */
     public function addMergedHeaderFilter($sqlIndex, $function) {
         if (!isset($this->mergedHeaderFilters[$sqlIndex])) {
             $this->mergedHeaderFilters[$sqlIndex] = array();
@@ -603,12 +708,16 @@ class MergedReportRun extends ReportRun {
     private $substmts;
     private $lastValues;
 
+    /** Create a run from a MergedReport. Don't create MergedReportRun
+     * by hand, use MergedReport->run instead. */
     public function __construct($mergedReport, $values) {
         $this->report = $mergedReport;
         $this->values = $values;
         $pdo = PDOBuilder::getPDO();
+        // Prepare the main query
         $this->stmt = $pdo->prepare($mergedReport->getSql());
         foreach ($mergedReport->getParams() as $param) {
+            // Set input values
             $id = $param["param"];
             $val = null;
             if (isset($this->values[$id])) {
@@ -631,10 +740,12 @@ class MergedReportRun extends ReportRun {
                 break;
             }
         }
+        // Prepare subqueries
         $this->substmts = array();
         foreach ($mergedReport->getSubsqls() as $sql) {
             $substmt = $pdo->prepare($sql);
             foreach ($mergedReport->getParams() as $param) {
+				// Set input values
                 $id = $param['param'];
                 if (isset($this->values[$id])) {
                     $val = $this->values[$id];
@@ -658,6 +769,7 @@ class MergedReportRun extends ReportRun {
             }
             $this->substmts[] = $substmt;
         }
+        // Initialize output values
         $this->groupRowCount = 0;
         $this->totalRowCount = 0;
         $this->tmpTotals = array();
@@ -665,11 +777,12 @@ class MergedReportRun extends ReportRun {
         $this->subtotals = array();
         $this->lastValues = array();
         $this->currentGroup = NULL;
+        // Check for results in the main query
         $this->stmt->execute();
-        // Check for results
         if (!$this->stmt->fetch()) {
             $this->empty = TRUE;
         }
+        // Reset the main query not to skip the first row
         $this->stmt->closeCursor();
         $this->stmt->execute();
         // Make a first run of substatements to get new fields
@@ -683,6 +796,7 @@ class MergedReportRun extends ReportRun {
             $substmt->closeCursor();
             $substmt->execute();
         }
+        // Initialize total values now that all fields are discovered.
         $this->resetTmpSubtotals();
         foreach ($this->report->getTotals() as $field => $type) {
             $this->tmpTotals[$field] = 0;
@@ -698,17 +812,25 @@ class MergedReportRun extends ReportRun {
         return TRUE;
     }
 
+    /** Fetch a row of data from the sql queries. */
     protected function fetchValues() {
+        // Get values from the main query
         $allValues = parent::fetchValues();
+        // Store merge field values of the main query to check matching
+        // in subqueries
         $mergeData = array();
         foreach ($this->report->getMergeFields() as $mergeField) {
             $mergeData[$mergeField] = $allValues[$mergeField];
         }
+        // Fetch values from subqueries
         for ($i = 0; $i < count($this->substmts); $i++) {
             $substmt = $this->substmts[$i];
             if (! isset($this->lastValues[$i])) {
+                // First call of the subquery, fetch one row to check
                 $this->lastValues[$i] = $substmt->fetch(\PDO::FETCH_ASSOC);
             }
+            // Check if the current row matches the merge field values
+            // and fetch the next line until it doesn't match anymore
             while ($this->checkMergeValues($mergeData, $this->lastValues[$i])) {
                 $currValues = $this->lastValues[$i];
                 $allValues[$currValues["__KEY__"]] = $currValues["__VALUE__"];
