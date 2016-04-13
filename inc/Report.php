@@ -709,6 +709,9 @@ class MergedReportRun extends ReportRun {
             if (! isset($this->lastValues[$i])) {
                 $this->lastValues[$i] = $substmt->fetch(\PDO::FETCH_ASSOC);
             }
+	    if (isset($allValues[$currValues["__KEY__"]])) {
+		break;
+	    }
             while ($this->checkMergeValues($mergeData, $this->lastValues[$i])) {
                 $currValues = $this->lastValues[$i];
                 $allValues[$currValues["__KEY__"]] = $currValues["__VALUE__"];
