@@ -169,7 +169,7 @@ function __tpl_report_input($report, $values) {
 		. "<a role=\"button\" data-toggle=\"collapse\""
 		. " data-parent=\"#options\" href=\"#options-collapsed\""
 		. " aria-expanded=\"false\" aria-controls=\"options-collapsed\">"
-		. "Options</a></h4>\n";
+		. "<span class=\"glyphicon glyphicon-menu-hamburger\" aria-hidden=\"false\"></span>&nbsp;(options)</a></h4>\n";
 	echo "\t\t</div>\n";
 	echo "\t\t<div id=\"options-collapsed\" class=\"panel-collapse collapse\""
 		. " role=\"tabpanel\" aria-labelledby=\"options-heading\">\n";
