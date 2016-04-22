@@ -41,6 +41,7 @@ echo \Pasteque\row(\Pasteque\mainTitle(\i18n("Providers", PLUGIN_NAME)));
 //Buttons
 $buttons = \Pasteque\addButton(\i18n('Add a provider', PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "provider_edit"));
 $buttons .= \Pasteque\importButton(\i18n('Import providers', PLUGIN_NAME),\Pasteque\get_module_url_action(PLUGIN_NAME, "providersManagement"));
+$buttons .= \Pasteque\exportButton(\i18n("Export providers", PLUGIN_NAME),\Pasteque\get_report_url(PLUGIN_NAME,"providers_export"));
 echo \Pasteque\row(\Pasteque\buttonGroup($buttons));
 //Information
 \Pasteque\tpl_msg_box($message, $error);
