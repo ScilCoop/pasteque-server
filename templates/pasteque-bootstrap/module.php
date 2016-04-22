@@ -59,7 +59,7 @@ function tpl_close() {
 </div>
 <div id="footer" class="navbar-inverse navbar-fixed-bottom">
 	<div class="container-fluid text-center">
-		<span class="navbar-link">
+		<span class="hidden-xs navbar-link">
 			<a href="" onclick="showAbout();return false;"><?php echo \i18n("About"); ?></a> − <?php \pi18n("Copyright"); ?>
 		</span>
 	</div>
