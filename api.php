@@ -64,7 +64,7 @@ if ($api == "ImagesAPI") {
     header("Cache-Control: max-age=864000");
     echo($result);
 } else {
-    header("Content type: application/json");
+    header("Content-Type: application/json");
     echo json_encode($result);
 }
 
